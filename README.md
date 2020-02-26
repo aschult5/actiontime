@@ -20,3 +20,19 @@ A simple library that allows concurrent use of the following methods:
 {"action":"run", "avg":75}
 ```
 
+## Design
+### Assumptions
+* `time` values may only be natural numbers that can be represented by an unsigned 64 bit integer
+* `action` values may only be strings
+* Case-sensitive keys and values
+* The set of valid `action` values is reasonably small, i.e. will fit into memory
+* No need to persist inputs
+* No need to track of the sums of `time` values
+* Result of `getStats` does not need to be strictly chronologically-accurate
+  * Rationale:
+    1. No indication that `addAction` should be treated as a sensitive transaction, e.g. a bank deposit or withdrawal
+    2. Averages are fuzzy by nature and in the long run individual calls to `addAction` will have little effect
+
+## Considerations
+### Language
+I have never before written *anything* in GoLang, but it has elegant support for concurrency and json, which are core aspects of this project.
