@@ -9,3 +9,11 @@ func TestAddAction(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetStats(t *testing.T) {
+	obj := ActionStat{}
+	s := obj.GetStats()
+	if s != `{}` {
+		t.Fail()
+	}
+}
