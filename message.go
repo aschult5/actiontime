@@ -1,7 +1,7 @@
-package actionstat
+package action
 
 // ActionMessage defines the schema for messages passed to AddAction.
-type ActionMessage struct {
+type Message struct {
 	Action *string
 	Time   *float64
 }

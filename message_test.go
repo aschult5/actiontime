@@ -1,4 +1,4 @@
-package actionstat
+package action
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 var goodJson []byte = []byte(`{"Action":"jump","Time":100}`)
 
 func TestJsonUnmarshal(t *testing.T) {
-	var m ActionMessage
+	var m Message
 
 	err := json.Unmarshal(goodJson, &m)
 	if err != nil {
@@ -36,7 +36,7 @@ func TestJsonUnmarshal(t *testing.T) {
 func TestJsonMarshal(t *testing.T) {
 	action := "jump"
 	var num float64 = 100
-	m := ActionMessage{&action, &num}
+	m := Message{&action, &num}
 
 	b, err := json.Marshal(m)
 
