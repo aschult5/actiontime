@@ -26,7 +26,8 @@ A simple library that allows concurrent use of the following methods:
 ### Assumptions
 * `time` values may only be natural numbers that can be represented by an unsigned 64 bit integer
 * `action` values may only be strings
-* Case-sensitive keys and values
+* Case-insensitive keys
+* Case-sensitive values
 * The set of valid `action` values is reasonably small, i.e. will fit into memory
 * No need to persist inputs
 * No need to track of the sums of `time` values
