@@ -4,9 +4,9 @@ import "testing"
 
 func TestAddAction(t *testing.T) {
 	obj := ActionStat{}
-	e := obj.AddAction(`{"action": "jump", "time": 100}`)
-	if e != nil {
-		t.Fail()
+	err = obj.AddAction(b)
+	if err != nil {
+		t.Error(err)
 	}
 }
 
@@ -14,6 +14,6 @@ func TestGetStats(t *testing.T) {
 	obj := ActionStat{}
 	s := obj.GetStats()
 	if s != `{}` {
-		t.Fail()
+		t.Errorf("Expected empty json object, not %s", s)
 	}
 }
