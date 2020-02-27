@@ -1,10 +1,21 @@
 package actionstat
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestAddAction(t *testing.T) {
+	// Convert valid message to byte array
+	m := ActionMessage{"jump", 100}
+	b, err := json.Marshal(m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Verify valid ActionMessage doesn't produce an error
 	obj := ActionStat{}
-	err = obj.AddAction(b)
+	err = obj.AddAction(string(b))
 	if err != nil {
 		t.Error(err)
 	}
