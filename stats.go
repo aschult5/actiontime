@@ -7,6 +7,7 @@ import (
 
 // Stats tracks passed actions' average times.
 type Stats struct {
+	statsImpl
 }
 
 var ErrMissingInput = errors.New("action: Missing input data")
@@ -14,7 +15,7 @@ var ErrMissingInput = errors.New("action: Missing input data")
 // AddAction takes json input and updates the action's time average.
 // Keys are case insensitive.
 // String values are case sensitive.
-func (a Stats) AddAction(input string) error {
+func (a *Stats) AddAction(input string) error {
 	var m Message
 
 	err := json.Unmarshal([]byte(input), &m)
@@ -26,10 +27,11 @@ func (a Stats) AddAction(input string) error {
 		return ErrMissingInput
 	}
 
+	a.addAction(m)
 	return nil
 }
 
 // GetStats returns the averages of all actions as json.
-func (a Stats) GetStats() string {
-	return "{}"
+func (a *Stats) GetStats() string {
+	return a.getStats()
 }
