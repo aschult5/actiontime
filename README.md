@@ -37,6 +37,7 @@ A simple library that allows concurrent use of the following methods:
   * Rationale:
     1. No indication that `addAction` should be treated as a sensitive transaction, e.g. a bank deposit or withdrawal
     2. Averages are fuzzy by nature and in the long run individual calls to `addAction` will have little effect
+* Caller is responsible for formatting result of `GetStats`
 
 ## Considerations
 ### Language

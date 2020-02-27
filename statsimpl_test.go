@@ -16,7 +16,7 @@ func TestImplGetStats(t *testing.T) {
 	var impl statsImpl
 
 	stats := impl.getStats()
-	if stats != `{}` {
-		t.Errorf("Expected empty json object, not %s", stats)
+	if len(stats) != 0 {
+		t.Errorf("Expected empty stats, not %v", stats)
 	}
 }

@@ -66,7 +66,7 @@ func TestNullJson(t *testing.T) {
 func TestGetStats(t *testing.T) {
 	obj := Stats{}
 	s := obj.GetStats()
-	if s != `{}` {
+	if s != `[]` {
 		t.Errorf("Expected empty json object, not %s", s)
 	}
 }

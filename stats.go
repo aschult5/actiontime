@@ -3,6 +3,7 @@ package action
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 // Stats tracks passed actions' average times.
@@ -33,5 +34,11 @@ func (a *Stats) AddAction(input string) error {
 
 // GetStats returns the averages of all actions as json.
 func (a *Stats) GetStats() string {
-	return a.getStats()
+	b, err := json.Marshal(a.getStats())
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+
+	return string(b)
 }
