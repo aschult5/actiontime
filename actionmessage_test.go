@@ -33,7 +33,7 @@ func TestJsonUnmarshal(t *testing.T) {
 	}
 }
 
-func TestJsonMarchas(t *testing.T) {
+func TestJsonMarshal(t *testing.T) {
 	action := "jump"
 	var num float64 = 100
 	m := ActionMessage{&action, &num}
