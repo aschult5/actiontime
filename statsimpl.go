@@ -4,10 +4,13 @@ package action
 type statsImpl map[string]Average
 
 // addAction implements Stats.AddAction
-func (impl statsImpl) addAction(msg InputMessage) {
-	avg := impl[*msg.Action]
-
+func (impl *statsImpl) addAction(msg InputMessage) {
+	if len(*impl) == 0 {
+		*impl = make(statsImpl)
+	}
+	avg := (*impl)[*msg.Action]
 	avg.Add(*msg.Time)
+	(*impl)[*msg.Action] = avg
 }
 
 // getStats implements Stats.GetStats
