@@ -7,6 +7,7 @@ import (
 )
 
 var goodInput []byte = []byte(`{"Action":"jump","Time":100}`)
+var goodOutput []byte = []byte(`{"action":"jump","avg":100}`)
 
 func TestInputUnmarshal(t *testing.T) {
 	var msg InputMessage
@@ -46,5 +47,36 @@ func TestInputMarshal(t *testing.T) {
 
 	if !bytes.Equal(b, goodInput) {
 		t.Errorf("%s != %s", b, goodInput)
+	}
+}
+
+func TestOutputUnmarshal(t *testing.T) {
+	var msg OutputMessage
+
+	err := json.Unmarshal(goodOutput, &msg)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if msg.Action != "jump" {
+		t.Errorf("%s != %s", msg.Action, "jump")
+	}
+
+	if msg.Average != 100 {
+		t.Errorf("%f != %d", msg.Average, 100)
+	}
+}
+
+func TestOutputMarshal(t *testing.T) {
+	msg := OutputMessage{"jump", 100}
+
+	b, err := json.Marshal(msg)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !bytes.Equal(b, goodOutput) {
+		t.Errorf("%s != %s", b, goodOutput)
 	}
 }
