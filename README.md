@@ -26,8 +26,10 @@ A simple library that allows concurrent use of the following methods:
 ### Assumptions
 * `time` values may only be json numbers
 * `action` values may only be json strings
-* Case-insensitive keys
+* Case-insensitive keys; duplicate normalized keys will follow [go's preference](https://blog.golang.org/json-and-go)
 * Case-sensitive values
+* Empty or missing fields should produce an error
+* Extra fields can be ignored
 * The set of valid `action` values is reasonably small, i.e. will fit into memory
 * No need to persist inputs
 * No need to track of the sums of `time` values
