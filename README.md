@@ -24,8 +24,8 @@ A simple library that allows concurrent use of the following methods:
 
 ## Design
 ### Assumptions
-* `time` values may only be natural numbers that can be represented by an unsigned 64 bit integer
-* `action` values may only be strings
+* `time` values may only be json numbers
+* `action` values may only be json strings
 * Case-insensitive keys
 * Case-sensitive values
 * The set of valid `action` values is reasonably small, i.e. will fit into memory
