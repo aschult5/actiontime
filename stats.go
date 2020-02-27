@@ -3,7 +3,6 @@ package action
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 // Stats tracks passed actions' average times.
@@ -20,16 +19,13 @@ func (a Stats) AddAction(input string) error {
 
 	err := json.Unmarshal([]byte(input), &m)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	if m.Action == nil || m.Time == nil {
-		fmt.Println(ErrMissingInput)
 		return ErrMissingInput
 	}
 
-	fmt.Println(m)
 	return nil
 }
 
