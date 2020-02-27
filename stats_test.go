@@ -67,6 +67,34 @@ func TestGetStats(t *testing.T) {
 	}
 }
 
+func TestAddAndGet(t *testing.T) {
+	// Form a valid input string
+	action := "jump"
+	var time float64 = 100
+	istr := getInputMessageString(&action, &time)
+
+	// Add the action
+	obj := Stats{}
+	obj.AddAction(istr)
+
+	// Retrieve the stats and verify them
+	ostr := obj.GetStats()
+	var messages []OutputMessage
+	err := json.Unmarshal([]byte(ostr), &messages)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(messages) != 1 {
+		t.Errorf("Expected stats with 1 entry, not %v", messages)
+	}
+
+	expected := OutputMessage{action, time}
+	if messages[0] != expected {
+		t.Errorf("%v did not match expected %v", messages[0], expected)
+	}
+}
+
 // getInputMessageString converts valid message values to a json string
 func getInputMessageString(action *string, time *float64) string {
 	msg := InputMessage{action, time}
