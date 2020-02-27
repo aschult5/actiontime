@@ -7,7 +7,9 @@ import (
 
 func TestAddAction(t *testing.T) {
 	// Convert valid message to byte array
-	m := ActionMessage{"jump", 100}
+	action := "jump"
+	var num float64 = 100
+	m := ActionMessage{&action, &num}
 	b, err := json.Marshal(m)
 	if err != nil {
 		t.Error(err)
@@ -40,7 +42,7 @@ func TestExtraJson(t *testing.T) {
 func TestMissingJson(t *testing.T) {
 	obj := ActionStat{}
 	err := obj.AddAction(`{"action": "jump"}`)
-	if err == nil {
+	if err != ErrMissingInput {
 		t.Error("Didn't detect missing parameter")
 	}
 }
@@ -56,7 +58,7 @@ func TestUnexpectedJson(t *testing.T) {
 func TestNullJson(t *testing.T) {
 	obj := ActionStat{}
 	err := obj.AddAction("null")
-	if err == nil {
+	if err != ErrMissingInput {
 		t.Error("Didn't detect null json")
 	}
 }

@@ -16,17 +16,27 @@ func TestJsonUnmarshal(t *testing.T) {
 		t.Error(err)
 	}
 
-	if m.Action != "jump" {
-		t.Errorf("%s != %s", m.Action, "jump")
+	if m.Action == nil {
+		t.Error("Failed to parse Action")
 	}
 
-	if m.Time != 100 {
-		t.Errorf("%f != %d", m.Time, 100)
+	if m.Time == nil {
+		t.Error("Failed to parse Time")
+	}
+
+	if *m.Action != "jump" {
+		t.Errorf("%s != %s", *m.Action, "jump")
+	}
+
+	if *m.Time != 100 {
+		t.Errorf("%f != %d", *m.Time, 100)
 	}
 }
 
 func TestJsonMarchas(t *testing.T) {
-	m := ActionMessage{"jump", 100}
+	action := "jump"
+	var num float64 = 100
+	m := ActionMessage{&action, &num}
 
 	b, err := json.Marshal(m)
 
