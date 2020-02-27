@@ -7,7 +7,7 @@ func TestImplAddAction(t *testing.T) {
 	action := "jump"
 	time := 100.0
 
-	msg := Message{&action, &time}
+	msg := InputMessage{&action, &time}
 
 	impl.addAction(msg)
 }

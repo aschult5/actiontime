@@ -6,45 +6,45 @@ import (
 	"testing"
 )
 
-var goodJson []byte = []byte(`{"Action":"jump","Time":100}`)
+var goodInput []byte = []byte(`{"Action":"jump","Time":100}`)
 
-func TestJsonUnmarshal(t *testing.T) {
-	var m Message
+func TestInputUnmarshal(t *testing.T) {
+	var msg InputMessage
 
-	err := json.Unmarshal(goodJson, &m)
+	err := json.Unmarshal(goodInput, &msg)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if m.Action == nil {
+	if msg.Action == nil {
 		t.Error("Failed to parse Action")
 	}
 
-	if m.Time == nil {
+	if msg.Time == nil {
 		t.Error("Failed to parse Time")
 	}
 
-	if *m.Action != "jump" {
-		t.Errorf("%s != %s", *m.Action, "jump")
+	if *msg.Action != "jump" {
+		t.Errorf("%s != %s", *msg.Action, "jump")
 	}
 
-	if *m.Time != 100 {
-		t.Errorf("%f != %d", *m.Time, 100)
+	if *msg.Time != 100 {
+		t.Errorf("%f != %d", *msg.Time, 100)
 	}
 }
 
-func TestJsonMarshal(t *testing.T) {
+func TestInputMarshal(t *testing.T) {
 	action := "jump"
 	var num float64 = 100
-	m := Message{&action, &num}
+	msg := InputMessage{&action, &num}
 
-	b, err := json.Marshal(m)
+	b, err := json.Marshal(msg)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if !bytes.Equal(b, goodJson) {
-		t.Errorf("%s != %s", b, goodJson)
+	if !bytes.Equal(b, goodInput) {
+		t.Errorf("%s != %s", b, goodInput)
 	}
 }

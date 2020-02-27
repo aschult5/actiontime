@@ -9,13 +9,13 @@ func TestAddAction(t *testing.T) {
 	// Convert valid message to byte array
 	action := "jump"
 	var num float64 = 100
-	m := Message{&action, &num}
-	b, err := json.Marshal(m)
+	msg := InputMessage{&action, &num}
+	b, err := json.Marshal(msg)
 	if err != nil {
 		t.Error(err)
 	}
 
-	// Verify valid Message doesn't produce an error
+	// Verify valid InputMessage doesn't produce an error
 	obj := Stats{}
 	err = obj.AddAction(string(b))
 	if err != nil {

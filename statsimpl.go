@@ -5,7 +5,7 @@ type statsImpl struct {
 }
 
 // addAction implements Stats.AddAction
-func (impl *statsImpl) addAction(msg Message) {
+func (impl *statsImpl) addAction(msg InputMessage) {
 }
 
 // getStats implements Stats.GetStats

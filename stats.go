@@ -16,18 +16,18 @@ var ErrMissingInput = errors.New("action: Missing input data")
 // Keys are case insensitive.
 // String values are case sensitive.
 func (a *Stats) AddAction(input string) error {
-	var m Message
+	var msg InputMessage
 
-	err := json.Unmarshal([]byte(input), &m)
+	err := json.Unmarshal([]byte(input), &msg)
 	if err != nil {
 		return err
 	}
 
-	if m.Action == nil || m.Time == nil {
+	if msg.Action == nil || msg.Time == nil {
 		return ErrMissingInput
 	}
 
-	a.addAction(m)
+	a.addAction(msg)
 	return nil
 }
 
