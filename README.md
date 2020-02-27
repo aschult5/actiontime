@@ -1,5 +1,6 @@
 # Concurrent Actions
 [![Build Status](https://travis-ci.com/aschult5/go-action-time.svg?branch=master)](https://travis-ci.com/aschult5/go-action-time)
+[![codecov](https://codecov.io/gh/aschult5/go-action-time/branch/master/graph/badge.svg)](https://codecov.io/gh/aschult5/go-action-time)
 
 A simple library that allows concurrent use of the following methods:
 
