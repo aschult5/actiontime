@@ -6,18 +6,14 @@ import (
 )
 
 func TestAddAction(t *testing.T) {
-	// Convert valid message to byte array
+	// Form a valid input string
 	action := "jump"
-	var num float64 = 100
-	msg := InputMessage{&action, &num}
-	b, err := json.Marshal(msg)
-	if err != nil {
-		t.Error(err)
-	}
+	var time float64 = 100
+	str := getInputMessageString(&action, &time)
 
 	// Verify valid InputMessage doesn't produce an error
 	obj := Stats{}
-	err = obj.AddAction(string(b))
+	err := obj.AddAction(str)
 	if err != nil {
 		t.Error(err)
 	}
@@ -69,4 +65,11 @@ func TestGetStats(t *testing.T) {
 	if s != `[]` {
 		t.Errorf("Expected empty json object, not %s", s)
 	}
+}
+
+// getInputMessageString converts valid message values to a json string
+func getInputMessageString(action *string, time *float64) string {
+	msg := InputMessage{action, time}
+	b, _ := json.Marshal(msg)
+	return string(b)
 }
