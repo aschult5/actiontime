@@ -10,7 +10,7 @@ var goodInput []byte = []byte(`{"Action":"jump","Time":100}`)
 var goodOutput []byte = []byte(`{"action":"jump","avg":100}`)
 
 func TestInputUnmarshal(t *testing.T) {
-	var msg InputMessage
+	var msg inputMessage
 
 	err := json.Unmarshal(goodInput, &msg)
 	if err != nil {
@@ -37,7 +37,7 @@ func TestInputUnmarshal(t *testing.T) {
 func TestInputMarshal(t *testing.T) {
 	action := "jump"
 	var num float64 = 100
-	msg := InputMessage{&action, &num}
+	msg := inputMessage{&action, &num}
 
 	b, err := json.Marshal(msg)
 
@@ -51,7 +51,7 @@ func TestInputMarshal(t *testing.T) {
 }
 
 func TestOutputUnmarshal(t *testing.T) {
-	var msg OutputMessage
+	var msg outputMessage
 
 	err := json.Unmarshal(goodOutput, &msg)
 	if err != nil {
@@ -68,7 +68,7 @@ func TestOutputUnmarshal(t *testing.T) {
 }
 
 func TestOutputMarshal(t *testing.T) {
-	msg := OutputMessage{"jump", 100}
+	msg := outputMessage{"jump", 100}
 
 	b, err := json.Marshal(msg)
 

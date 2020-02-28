@@ -114,12 +114,12 @@ func executeCommand(cmd testCommand, impl *statsImpl) error {
 		// Copies of action and value made as `cmd` may go out of scope
 		go func(action string, value float64) {
 			defer wg.Done()
-			msg := InputMessage{&action, &value}
+			msg := inputMessage{&action, &value}
 			impl.addAction(msg)
 		}(cmd.Action, cmd.Value)
 
 	case "add":
-		msg := InputMessage{&cmd.Action, &cmd.Value}
+		msg := inputMessage{&cmd.Action, &cmd.Value}
 		impl.addAction(msg)
 
 	case "get":
@@ -132,7 +132,7 @@ func executeCommand(cmd testCommand, impl *statsImpl) error {
 	return nil
 }
 
-func handleStats(stats []OutputMessage, action string, value float64) error {
+func handleStats(stats []outputMessage, action string, value float64) error {
 	const TOLERANCE = 0.000001
 	if action == "_len_" {
 		// Testing length

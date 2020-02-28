@@ -12,7 +12,7 @@ type statsImpl struct {
 }
 
 // addAction implements Stats.AddAction
-func (impl *statsImpl) addAction(msg InputMessage) {
+func (impl *statsImpl) addAction(msg inputMessage) {
 	impl.avgMu.Lock()
 	defer impl.avgMu.Unlock()
 
@@ -25,14 +25,14 @@ func (impl *statsImpl) addAction(msg InputMessage) {
 }
 
 // getStats implements Stats.GetStats
-func (impl *statsImpl) getStats() []OutputMessage {
+func (impl *statsImpl) getStats() []outputMessage {
 	impl.avgMu.RLock()
 	defer impl.avgMu.RUnlock()
 
-	ret := make([]OutputMessage, 0, len(impl.avg))
+	ret := make([]outputMessage, 0, len(impl.avg))
 
 	for key, avg := range impl.avg {
-		ret = append(ret, OutputMessage{key, avg.Value})
+		ret = append(ret, outputMessage{key, avg.Value})
 	}
 
 	return ret

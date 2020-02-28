@@ -11,7 +11,7 @@ func TestAddAction(t *testing.T) {
 	var time float64 = 100
 	str := getInputMessageString(&action, &time)
 
-	// Verify valid InputMessage doesn't produce an error
+	// Verify valid inputMessage doesn't produce an error
 	obj := Stats{}
 	err := obj.AddAction(str)
 	if err != nil {
@@ -79,7 +79,7 @@ func TestAddAndGet(t *testing.T) {
 
 	// Retrieve the stats and verify them
 	ostr := obj.GetStats()
-	var messages []OutputMessage
+	var messages []outputMessage
 	err := json.Unmarshal([]byte(ostr), &messages)
 	if err != nil {
 		t.Error(err)
@@ -88,7 +88,7 @@ func TestAddAndGet(t *testing.T) {
 	if len(messages) != 1 {
 		t.Errorf("Expected stats with 1 entry, not %v", messages)
 	} else {
-		expected := OutputMessage{action, time}
+		expected := outputMessage{action, time}
 		if messages[0] != expected {
 			t.Errorf("%v did not match expected %v", messages[0], expected)
 		}
@@ -97,7 +97,7 @@ func TestAddAndGet(t *testing.T) {
 
 // getInputMessageString converts valid message values to a json string
 func getInputMessageString(action *string, time *float64) string {
-	msg := InputMessage{action, time}
+	msg := inputMessage{action, time}
 	b, _ := json.Marshal(msg)
 	return string(b)
 }
