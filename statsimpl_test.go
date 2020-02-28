@@ -10,24 +10,22 @@ import (
 	"testing"
 )
 
-const tcprefix string = "statsimpl_tc_"
-
 var wg sync.WaitGroup
 
 func TestEmpty(t *testing.T) {
-	runTestCase(tcprefix+"empty.csv", t)
+	runTestCase("tc_empty.csv", t)
 }
 
-func TestOneActionOneAdd(t *testing.T) {
-	runTestCase(tcprefix+"one_one.csv", t)
+func TestOneAdd(t *testing.T) {
+	runTestCase("tc_one.csv", t)
 }
 
-func TestTwoActionFourAdd(t *testing.T) {
-	runTestCase(tcprefix+"two_four.csv", t)
+func TestFewAdds(t *testing.T) {
+	runTestCase("tc_few.csv", t)
 }
 
-func TestTwoActionFourAddAsync(t *testing.T) {
-	runTestCase(tcprefix+"two_four_async.csv", t)
+func TestFewAsync(t *testing.T) {
+	runTestCase("tc_few_async.csv", t)
 }
 
 // testCommand represents a line in a given test case
