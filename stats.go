@@ -11,6 +11,7 @@ type Stats struct {
 	statsImpl
 }
 
+// ErrMissingInput indicates that the input to AddAction was missing data.
 var ErrMissingInput = errors.New("action: Missing input data")
 
 // AddAction takes json input and updates the action's time average.
