@@ -1,3 +1,5 @@
+// Package actiontime takes actions and times as json, tracking average times.
+// Input is received as a json string, per requirements.
 package actiontime
 
 import (
@@ -12,7 +14,7 @@ type Stats struct {
 }
 
 // ErrMissingInput indicates that the input to AddAction was missing data.
-var ErrMissingInput = errors.New("action: Missing input data")
+var ErrMissingInput = errors.New("actiontime: Missing input data")
 
 // AddAction takes json input and updates the action's time average.
 // Keys are case insensitive.
