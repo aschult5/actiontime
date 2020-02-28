@@ -10,5 +10,5 @@ type Average struct {
 func (avg *Average) Add(val float64) {
 	avg.Value *= float64(avg.Count) / float64(avg.Count+1)
 	avg.Value += val / float64(avg.Count+1)
-	avg.Count += 1
+	avg.Count++
 }
