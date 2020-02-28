@@ -1,34 +1,37 @@
 package action
 
-import "sync"
+import (
+	average "github.com/aschult5/go-action-time/average"
+	"sync"
+)
 
 // statsImpl implements Stats
 type statsImpl struct {
-	average   map[string]Average
-	averageMu sync.RWMutex
+	avg   map[string]average.Running
+	avgMu sync.RWMutex
 }
 
 // addAction implements Stats.AddAction
 func (impl *statsImpl) addAction(msg InputMessage) {
-	impl.averageMu.Lock()
-	defer impl.averageMu.Unlock()
+	impl.avgMu.Lock()
+	defer impl.avgMu.Unlock()
 
-	if len(impl.average) == 0 {
-		impl.average = make(map[string]Average)
+	if len(impl.avg) == 0 {
+		impl.avg = make(map[string]average.Running)
 	}
-	avg := impl.average[*msg.Action]
+	avg := impl.avg[*msg.Action]
 	avg.Add(*msg.Time)
-	impl.average[*msg.Action] = avg
+	impl.avg[*msg.Action] = avg
 }
 
 // getStats implements Stats.GetStats
 func (impl *statsImpl) getStats() []OutputMessage {
-	impl.averageMu.RLock()
-	defer impl.averageMu.RUnlock()
+	impl.avgMu.RLock()
+	defer impl.avgMu.RUnlock()
 
-	ret := make([]OutputMessage, 0, len(impl.average))
+	ret := make([]OutputMessage, 0, len(impl.avg))
 
-	for key, avg := range impl.average {
+	for key, avg := range impl.avg {
 		ret = append(ret, OutputMessage{key, avg.Value})
 	}
 

@@ -1,9 +1,9 @@
-package action
+package average
 
 import "testing"
 
 func TestNaturalAverage(t *testing.T) {
-	var avg Average
+	var avg Running
 
 	avg.Add(5)
 	avg.Add(15)
@@ -15,7 +15,7 @@ func TestNaturalAverage(t *testing.T) {
 }
 
 func TestRationalAverage(t *testing.T) {
-	var avg Average
+	var avg Running
 
 	avg.Add(3)
 	avg.Add(4)
@@ -27,7 +27,7 @@ func TestRationalAverage(t *testing.T) {
 }
 
 func TestEmptyAverage(t *testing.T) {
-	var avg Average
+	var avg Running
 
 	expected := 0.0
 
