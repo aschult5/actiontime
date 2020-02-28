@@ -33,7 +33,11 @@ def gen_test_body(actionTimes: Dict[str, List[float]]) -> List[TestCommand]:
     return ret
 
 def gen_test_end(averages: Dict[str, float]) -> List[TestCommand]:
-    return []
+    ret = [TestCommand('sync','',0)]
+    ret += [TestCommand('get',action,avg) for action,avg in averages.items()]
+    logging.debug(ret)
+
+    return ret
 
 
 if __name__ == '__main__':
