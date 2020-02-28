@@ -1,4 +1,4 @@
-module github.com/aschult5/go-action-time
+module github.com/aschult5/actiontime
 
 go 1.12
 

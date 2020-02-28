@@ -1,7 +1,7 @@
 package action
 
 import (
-	average "github.com/aschult5/go-action-time/average"
+	average "github.com/aschult5/actiontime/average"
 	"sync"
 )
 
