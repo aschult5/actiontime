@@ -2,6 +2,6 @@
 
 echo
 echo "##########TESTING START##########"
-go test -race || { exit $?; }
+go test || { exit $?; }
 echo "##########TESTING END  ##########"
 echo

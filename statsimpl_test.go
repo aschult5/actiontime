@@ -29,6 +29,16 @@ func TestFewAsync(t *testing.T) {
 	runTestCase("tc_few_few_async.csv", t)
 }
 
+func TestMilAsync(t *testing.T) {
+	tc := "tc_mil_few_async.csv"
+	if !fileExists(tc) {
+		cmd := fmt.Sprintf("python3 tools/testgenerator.py --csv %s --add 1000000 jump run sit stand", tc)
+		t.Errorf("Please generate %s with...\n`%s`", tc, cmd)
+	} else {
+		runTestCase(tc, t)
+	}
+}
+
 // testCommand represents a line in a given test case
 type testCommand struct {
 	Command string
@@ -150,4 +160,14 @@ func handleStats(stats []OutputMessage, action string, value float64) error {
 	}
 
 	return nil
+}
+
+// fileExists checks if a file exists and is not a directory before we
+// try using it to prevent further errors.
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
