@@ -48,7 +48,8 @@ if __name__ == '__main__':
                         default=1, help='number of calls to add (per action) to interleave')
     parser.add_argument('--maxtime', type=float, dest='maxtime', action='store',
                         default=1E6, help='maximum time an action can take')
-    parser.add_argument('--csv', type=str, dest='output', action='store', required=True)
+    parser.add_argument('--csv', type=str, dest='output', action='store', required=True,
+                        help='path relative to your CWD')
     parser.add_argument('--log', type=str, dest='loglevel', action='store', default='INFO',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'])
 
