@@ -1,12 +1,18 @@
 package action
 
+import "sync"
+
 // statsImpl implements Stats
 type statsImpl struct {
-	average map[string]Average
+	average   map[string]Average
+	averageMu sync.RWMutex
 }
 
 // addAction implements Stats.AddAction
 func (impl *statsImpl) addAction(msg InputMessage) {
+	impl.averageMu.Lock()
+	defer impl.averageMu.Unlock()
+
 	if len(impl.average) == 0 {
 		impl.average = make(map[string]Average)
 	}
@@ -17,6 +23,9 @@ func (impl *statsImpl) addAction(msg InputMessage) {
 
 // getStats implements Stats.GetStats
 func (impl *statsImpl) getStats() []OutputMessage {
+	impl.averageMu.RLock()
+	defer impl.averageMu.RUnlock()
+
 	ret := make([]OutputMessage, 0, len(impl.average))
 
 	for key, avg := range impl.average {
