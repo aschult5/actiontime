@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"strconv"
 	"sync"
@@ -122,6 +123,7 @@ func executeCommand(cmd testCommand, impl *statsImpl) error {
 }
 
 func handleStats(stats []OutputMessage, action string, value float64) error {
+	const TOLERANCE = 0.000001
 	if action == "_len_" {
 		// Testing length
 		if len(stats) != int(value) {
@@ -136,8 +138,9 @@ func handleStats(stats []OutputMessage, action string, value float64) error {
 			}
 			found = true
 
-			if msg.Average != value {
-				return fmt.Errorf(`"%s" average %f != %f`, msg.Action, msg.Average, value)
+			if diff := math.Abs(msg.Average - value); diff > TOLERANCE {
+				return fmt.Errorf(`"%s": average %f outside tolerance %f of %f`,
+					msg.Action, msg.Average, TOLERANCE, value)
 			}
 			break
 		}
