@@ -135,10 +135,11 @@ func handleStats(stats []OutputMessage, action string, value float64) error {
 			if msg.Action != action {
 				continue
 			}
+			found = true
+
 			if msg.Average != value {
 				return fmt.Errorf(`"%s" average %f != %f`, msg.Action, msg.Average, value)
 			}
-			found = true
 			break
 		}
 		if !found {
