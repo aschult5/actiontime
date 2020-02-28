@@ -44,6 +44,7 @@ func runTestCase(fn string, t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
+	defer csvfile.Close()
 
 	// Read file line by line
 	r := csv.NewReader(csvfile)
