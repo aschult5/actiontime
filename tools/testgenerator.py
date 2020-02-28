@@ -3,6 +3,7 @@
 import argparse
 import csv
 import logging
+import random
 
 from collections import namedtuple
 from statistics import mean
@@ -12,7 +13,12 @@ from typing import Dict, List
 TestCommand = namedtuple('TestCommand', ['cmd', 'action', 'value'])
 
 def gen_action_times(actions: List[str], numadd: int, maxtime: float) -> Dict[str, List[float]]:
-    return {}
+    random.seed()
+
+    ret = {a: [random.uniform(0.0001, maxtime) for _ in range(numadd)] for a in actions}
+    logging.debug(ret)
+
+    return ret
 
 def gen_test_body(actionTimes: Dict[str, List[float]]) -> List[TestCommand]:
     return []
