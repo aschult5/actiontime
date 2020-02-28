@@ -1,0 +1,7 @@
+add,jump,100
+add,run,444
+add,jump,200
+add,run,222
+get,_len_,2
+get,run,333
+get,jump,150

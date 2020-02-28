@@ -18,6 +18,10 @@ func TestOneActionOneAdd(t *testing.T) {
 	testExecutor(tcprefix+"one_one.csv", t)
 }
 
+func TestTwoActionFourAdd(t *testing.T) {
+	testExecutor(tcprefix+"two_four.csv", t)
+}
+
 func testExecutor(fn string, t *testing.T) {
 	var impl statsImpl
 
