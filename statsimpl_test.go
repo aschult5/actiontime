@@ -17,15 +17,15 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestOneAdd(t *testing.T) {
-	runTestCase("tc_one.csv", t)
+	runTestCase("tc_one_one.csv", t)
 }
 
 func TestFewAdds(t *testing.T) {
-	runTestCase("tc_few.csv", t)
+	runTestCase("tc_few_few.csv", t)
 }
 
 func TestFewAsync(t *testing.T) {
-	runTestCase("tc_few_async.csv", t)
+	runTestCase("tc_few_few_async.csv", t)
 }
 
 // testCommand represents a line in a given test case
