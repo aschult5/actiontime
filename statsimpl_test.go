@@ -2,6 +2,7 @@ package action
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -11,18 +12,26 @@ import (
 const tcprefix string = "statsimpl_tc_"
 
 func TestEmpty(t *testing.T) {
-	testExecutor(tcprefix+"empty.csv", t)
+	runTestCase(tcprefix+"empty.csv", t)
 }
 
 func TestOneActionOneAdd(t *testing.T) {
-	testExecutor(tcprefix+"one_one.csv", t)
+	runTestCase(tcprefix+"one_one.csv", t)
 }
 
 func TestTwoActionFourAdd(t *testing.T) {
-	testExecutor(tcprefix+"two_four.csv", t)
+	runTestCase(tcprefix+"two_four.csv", t)
 }
 
-func testExecutor(fn string, t *testing.T) {
+// testCommand represents a line in a given test case
+type testCommand struct {
+	Command string
+	Action  string
+	Value   float64
+}
+
+// runTestCase reads fn as a csv file containing test commands
+func runTestCase(fn string, t *testing.T) {
 	var impl statsImpl
 
 	csvfile, err := os.Open(fn)
@@ -42,55 +51,76 @@ func testExecutor(fn string, t *testing.T) {
 			t.Error(err)
 			continue
 		}
-		if len(record) != 3 {
-			t.Errorf("Test case statements must be of form [<cmd>,<name>,<value>]")
-			t.FailNow()
-		}
 
 		// Parse fields
-		action := record[1]
-		num, err := strconv.ParseFloat(record[2], 64)
+		cmd, err := parseRecord(record)
 		if err != nil {
 			t.Error(err)
-			continue
 		}
 
-		// Intepret command
-		switch record[0] {
-
-		case "add":
-			msg := InputMessage{&action, &num}
-			impl.addAction(msg)
-
-		case "get":
-			stats := impl.getStats()
-			if action == "_len_" {
-				// Testing length
-				if len(stats) != int(num) {
-					t.Errorf("stats length %d != %d", len(stats), int(num))
-					break
-				}
-			} else {
-				// Testing action average
-				found := false
-				for _, msg := range stats {
-					if msg.Action != action {
-						continue
-					}
-					if msg.Average != num {
-						t.Errorf(`"%s" average %f != %f`, msg.Action, msg.Average, num)
-						break
-					}
-					found = true
-					break
-				}
-				if !found {
-					t.Errorf(`Action "%s" not found`, action)
-				}
-			}
-
-		default:
-			t.Errorf("Unexpected command %s", record[0])
+		// Execute cmd
+		err = executeCommand(cmd, &impl)
+		if err != nil {
+			t.Error(err)
 		}
 	}
+}
+
+// parseRecord attempts to parse an array of strings into a testCommand
+func parseRecord(record []string) (testCommand, error) {
+	var ret testCommand
+	if len(record) != 3 {
+		return ret, fmt.Errorf("Test case statements must be of form [<cmd>,<name>,<value>]")
+	}
+
+	cmd := record[0]
+	action := record[1]
+	val, err := strconv.ParseFloat(record[2], 64)
+	if err != nil {
+		return ret, err
+	}
+
+	ret = testCommand{cmd, action, val}
+	return ret, nil
+}
+
+// executeCommand executes the given command on the passed *statsImpl
+func executeCommand(cmd testCommand, impl *statsImpl) error {
+	// Intepret command
+	switch cmd.Command {
+
+	case "add":
+		msg := InputMessage{&cmd.Action, &cmd.Value}
+		impl.addAction(msg)
+
+	case "get":
+		stats := impl.getStats()
+		if cmd.Action == "_len_" {
+			// Testing length
+			if len(stats) != int(cmd.Value) {
+				return fmt.Errorf("stats length %d != %d", len(stats), int(cmd.Value))
+			}
+		} else {
+			// Testing action average
+			found := false
+			for _, msg := range stats {
+				if msg.Action != cmd.Action {
+					continue
+				}
+				if msg.Average != cmd.Value {
+					return fmt.Errorf(`"%s" average %f != %f`, msg.Action, msg.Average, cmd.Value)
+				}
+				found = true
+				break
+			}
+			if !found {
+				return fmt.Errorf(`Action "%s" not found`, cmd.Action)
+			}
+		}
+
+	default:
+		return fmt.Errorf("Unexpected command %s", cmd.Command)
+	}
+
+	return nil
 }
