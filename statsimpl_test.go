@@ -6,10 +6,13 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"sync"
 	"testing"
 )
 
 const tcprefix string = "statsimpl_tc_"
+
+var wg sync.WaitGroup
 
 func TestEmpty(t *testing.T) {
 	runTestCase(tcprefix+"empty.csv", t)
@@ -94,11 +97,16 @@ func executeCommand(cmd testCommand, impl *statsImpl) error {
 	switch cmd.Command {
 
 	case "sync":
-		// TODO use waitgroup to sync https://golang.org/pkg/sync/#WaitGroup
+		wg.Wait()
 
 	case "addasync":
-		msg := InputMessage{&cmd.Action, &cmd.Value}
-		go impl.addAction(msg)
+		wg.Add(1)
+		// Copies of action and value made as `cmd` may go out of scope
+		go func(action string, value float64) {
+			defer wg.Done()
+			msg := InputMessage{&action, &value}
+			impl.addAction(msg)
+		}(cmd.Action, cmd.Value)
 
 	case "add":
 		msg := InputMessage{&cmd.Action, &cmd.Value}
