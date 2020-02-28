@@ -23,6 +23,10 @@ func TestTwoActionFourAdd(t *testing.T) {
 	runTestCase(tcprefix+"two_four.csv", t)
 }
 
+func TestTwoActionFourAddAsync(t *testing.T) {
+	runTestCase(tcprefix+"two_four_async.csv", t)
+}
+
 // testCommand represents a line in a given test case
 type testCommand struct {
 	Command string
@@ -88,6 +92,13 @@ func parseRecord(record []string) (testCommand, error) {
 func executeCommand(cmd testCommand, impl *statsImpl) error {
 	// Intepret command
 	switch cmd.Command {
+
+	case "sync":
+		// TODO use waitgroup to sync https://golang.org/pkg/sync/#WaitGroup
+
+	case "addasync":
+		msg := InputMessage{&cmd.Action, &cmd.Value}
+		go impl.addAction(msg)
 
 	case "add":
 		msg := InputMessage{&cmd.Action, &cmd.Value}
