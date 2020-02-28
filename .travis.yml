@@ -5,7 +5,8 @@ before_install:
   - sudo apt-get -y install python3
 
 before_script:
-  - python3 ./tools/testgenerator.py --csv tc_mil_few_async.csv --add 1000000 jump run sit stand
+  - mkdir ./test/gen
+  - python3 ./tools/testgenerator.py --csv test/gen/tc_mil_few_async.csv --add 1000000 jump run sit stand
 
 script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic
