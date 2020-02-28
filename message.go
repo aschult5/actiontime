@@ -1,4 +1,4 @@
-package action
+package actiontime
 
 // inputMessage defines the schema for messages passed to AddAction.
 type inputMessage struct {

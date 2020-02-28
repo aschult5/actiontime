@@ -1,4 +1,4 @@
-package action
+package actiontime
 
 import (
 	average "github.com/aschult5/actiontime/average"
