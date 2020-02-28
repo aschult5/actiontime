@@ -87,11 +87,11 @@ func TestAddAndGet(t *testing.T) {
 
 	if len(messages) != 1 {
 		t.Errorf("Expected stats with 1 entry, not %v", messages)
-	}
-
-	expected := OutputMessage{action, time}
-	if messages[0] != expected {
-		t.Errorf("%v did not match expected %v", messages[0], expected)
+	} else {
+		expected := OutputMessage{action, time}
+		if messages[0] != expected {
+			t.Errorf("%v did not match expected %v", messages[0], expected)
+		}
 	}
 }
 
