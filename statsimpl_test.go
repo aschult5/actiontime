@@ -1,34 +1,92 @@
 package action
 
-import "testing"
+import (
+	"encoding/csv"
+	"io"
+	"os"
+	"strconv"
+	"testing"
+)
 
-func TestImplGetStats(t *testing.T) {
-	var impl statsImpl
+const tcprefix string = "statsimpl_tc_"
 
-	stats := impl.getStats()
-	if len(stats) != 0 {
-		t.Errorf("Expected empty stats, not %v", stats)
-	}
+func TestEmpty(t *testing.T) {
+	testExecutor(tcprefix+"empty.csv", t)
 }
 
-func TestImplAddAndGet(t *testing.T) {
+func TestOneActionOneAdd(t *testing.T) {
+	testExecutor(tcprefix+"one_one.csv", t)
+}
+
+func testExecutor(fn string, t *testing.T) {
 	var impl statsImpl
 
-	// Form InputMessage
-	action := "jump"
-	time := 100.0
-	msg := InputMessage{&action, &time}
+	csvfile, err := os.Open(fn)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
 
-	// Verify action was added
-	impl.addAction(msg)
-	stats := impl.getStats()
-	if len(stats) != 1 {
-		t.Errorf("Expected stats with 1 entry, not %v", stats)
-	} else {
-		// Verify OutputMessage matches expected
-		expected := OutputMessage{action, time}
-		if stats[0] != expected {
-			t.Errorf("%v did not match expected %v", stats[0], expected)
+	// Read file line by line
+	r := csv.NewReader(csvfile)
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		if len(record) != 3 {
+			t.Errorf("Test case statements must be of form [<cmd>,<name>,<value>]")
+			t.FailNow()
+		}
+
+		// Parse fields
+		action := record[1]
+		num, err := strconv.ParseFloat(record[2], 64)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		// Intepret command
+		switch record[0] {
+
+		case "add":
+			msg := InputMessage{&action, &num}
+			impl.addAction(msg)
+
+		case "get":
+			stats := impl.getStats()
+			if action == "_len_" {
+				// Testing length
+				if len(stats) != int(num) {
+					t.Errorf("stats length %d != %d", len(stats), int(num))
+					break
+				}
+			} else {
+				// Testing action average
+				found := false
+				for _, msg := range stats {
+					if msg.Action != action {
+						continue
+					}
+					if msg.Average != num {
+						t.Errorf(`"%s" average %f != %f`, msg.Action, msg.Average, num)
+						break
+					}
+					found = true
+					break
+				}
+				if !found {
+					t.Errorf(`Action "%s" not found`, action)
+				}
+			}
+
+		default:
+			t.Errorf("Unexpected command %s", record[0])
 		}
 	}
 }
