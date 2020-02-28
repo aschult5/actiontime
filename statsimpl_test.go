@@ -113,32 +113,37 @@ func executeCommand(cmd testCommand, impl *statsImpl) error {
 		impl.addAction(msg)
 
 	case "get":
-		stats := impl.getStats()
-		if cmd.Action == "_len_" {
-			// Testing length
-			if len(stats) != int(cmd.Value) {
-				return fmt.Errorf("stats length %d != %d", len(stats), int(cmd.Value))
-			}
-		} else {
-			// Testing action average
-			found := false
-			for _, msg := range stats {
-				if msg.Action != cmd.Action {
-					continue
-				}
-				if msg.Average != cmd.Value {
-					return fmt.Errorf(`"%s" average %f != %f`, msg.Action, msg.Average, cmd.Value)
-				}
-				found = true
-				break
-			}
-			if !found {
-				return fmt.Errorf(`Action "%s" not found`, cmd.Action)
-			}
-		}
+		return handleStats(impl.getStats(), cmd.Action, cmd.Value)
 
 	default:
 		return fmt.Errorf("Unexpected command %s", cmd.Command)
+	}
+
+	return nil
+}
+
+func handleStats(stats []OutputMessage, action string, value float64) error {
+	if action == "_len_" {
+		// Testing length
+		if len(stats) != int(value) {
+			return fmt.Errorf("stats length %d != %d", len(stats), int(value))
+		}
+	} else {
+		// Testing action average
+		found := false
+		for _, msg := range stats {
+			if msg.Action != action {
+				continue
+			}
+			if msg.Average != value {
+				return fmt.Errorf(`"%s" average %f != %f`, msg.Action, msg.Average, value)
+			}
+			found = true
+			break
+		}
+		if !found {
+			return fmt.Errorf(`Action "%s" not found`, action)
+		}
 	}
 
 	return nil
