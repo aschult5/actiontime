@@ -20,8 +20,17 @@ def gen_action_times(actions: List[str], numadd: int, maxtime: float) -> Dict[st
 
     return ret
 
+def gen_test_command(action, times):
+    for time in times:
+        yield TestCommand('addasync', action, time)
+
 def gen_test_body(actionTimes: Dict[str, List[float]]) -> List[TestCommand]:
-    return []
+    generators = [gen_test_command(action, times) for action,times in actionTimes.items()]
+
+    ret = [val for tup in zip(*generators) for val in tup]
+    logging.debug(ret)
+
+    return ret
 
 def gen_test_end(averages: Dict[str, float]) -> List[TestCommand]:
     return []
