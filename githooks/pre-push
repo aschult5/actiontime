@@ -1,3 +1,7 @@
 #!/bin/sh
 
+echo
+echo "##########TESTING START##########"
 go test -race || { exit $?; }
+echo "##########TESTING END  ##########"
+echo
