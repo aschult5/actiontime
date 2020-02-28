@@ -14,23 +14,23 @@ import (
 var wg sync.WaitGroup
 
 func TestEmpty(t *testing.T) {
-	runTestCase("tc_empty.csv", t)
+	runTestCase("test/tc_empty.csv", t)
 }
 
 func TestOneAdd(t *testing.T) {
-	runTestCase("tc_one_one.csv", t)
+	runTestCase("test/tc_one_one.csv", t)
 }
 
 func TestFewAdds(t *testing.T) {
-	runTestCase("tc_few_few.csv", t)
+	runTestCase("test/tc_few_few.csv", t)
 }
 
 func TestFewAsync(t *testing.T) {
-	runTestCase("tc_few_few_async.csv", t)
+	runTestCase("test/tc_few_few_async.csv", t)
 }
 
 func TestMilAsync(t *testing.T) {
-	tc := "tc_mil_few_async.csv"
+	tc := "test/gen/tc_mil_few_async.csv"
 	if !fileExists(tc) {
 		cmd := fmt.Sprintf("python3 tools/testgenerator.py --csv %s --add 1000000 jump run sit stand", tc)
 		t.Errorf("Please generate %s with...\n`%s`", tc, cmd)
