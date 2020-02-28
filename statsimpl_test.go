@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"os"
+	"os/exec"
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -27,6 +30,50 @@ func TestFewAdds(t *testing.T) {
 
 func TestFewAsync(t *testing.T) {
 	runTestCase("tc_few_few_async.csv", t)
+}
+
+func TestMilliAsync(t *testing.T) {
+	tc := "tc_mil_few_async.csv"
+	genTest(tc, 5, 1e6)
+
+	runTestCase(tc, t)
+}
+
+func genTest(fn string, numactions int, numAdds uint) error {
+	const actionLen uint = 5
+
+	// randSeq was taken from https://stackoverflow.com/a/22892986
+	rand.Seed(time.Now().UnixNano())
+	var letters = []rune("abcdefghijklmnopqrstuvwxyz")
+
+	randSeq := func(n uint) string {
+		b := make([]rune, n)
+		for i := range b {
+			b[i] = letters[rand.Intn(len(letters))]
+		}
+		return string(b)
+	}
+
+	var args = []string{fmt.Sprintf("--add %d", numAdds), fmt.Sprintf("--csv %s", fn)}
+	for i := 0; i < numactions; i++ {
+		args = append(args, randSeq(actionLen))
+	}
+
+	// Build command to call testgenerator
+	cmd := exec.Command(
+		"./tools/testgenerator.py",
+		args...)
+	fmt.Println(cmd)
+
+	// Execute command
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println(out)
+		fmt.Println(err.Error())
+		return err
+	}
+
+	return nil
 }
 
 // testCommand represents a line in a given test case
