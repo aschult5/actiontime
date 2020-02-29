@@ -24,6 +24,7 @@ python3 is required to generate test cases
 `go get github.com/aschult5/actiontime`
 
 ### Documentation
+From `go doc`
 ```go
 package actiontime // import "github.com/aschult5/actiontime"
 
@@ -34,6 +35,7 @@ var ErrMissingInput = errors.New("actiontime: Missing input data")
 type Stats struct{ ... }
 ```
 
+From `go doc Stats`
 ```go
 package actiontime // import "github.com/aschult5/actiontime"
 
