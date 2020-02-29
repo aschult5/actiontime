@@ -1,4 +1,4 @@
-# Concurrent Actions
+# Action Time
 [![Build Status](https://travis-ci.com/aschult5/actiontime.svg?branch=master)](https://travis-ci.com/aschult5/actiontime)
 [![codecov](https://codecov.io/gh/aschult5/actiontime/branch/master/graph/badge.svg)](https://codecov.io/gh/aschult5/actiontime)
 
