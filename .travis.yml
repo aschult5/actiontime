@@ -10,7 +10,7 @@ before_install:
 
 before_script:
   - mkdir ./testdata/gen
-  - python3 ./tools/testgenerator.py --csv testdata/gen/tc_mil_few_async.csv --add 1000000 jump run sit stand
+  - python3 ./tools/testgenerator.py --csv testdata/gen/tc_wr_mil_few_async.csv --add 1000000 jump run sit stand
 
 script: "go test $TEST_ARGS"
 
