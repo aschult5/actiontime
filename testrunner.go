@@ -19,8 +19,8 @@ type testRunner struct {
 	// TestT is the corresponding test handle
 	TestT *testing.T
 
-	// obj is the object under test
-	obj statsImpl
+	// Obj is the object under test
+	Obj statsWrapper
 
 	// wg is the WaitGroup for addasync and getasync commands
 	wg sync.WaitGroup
@@ -79,13 +79,11 @@ func (r *testRunner) execute(cmd testCommand) error {
 		// Copies of action and value made as `cmd` may go out of scope
 		go func(action string, value float64) {
 			defer r.wg.Done()
-			msg := inputMessage{&action, &value}
-			r.obj.addAction(msg)
+			r.Obj.Add(action, value)
 		}(cmd.Action, cmd.Value)
 
 	case "add":
-		msg := inputMessage{&cmd.Action, &cmd.Value}
-		r.obj.addAction(msg)
+		r.Obj.Add(cmd.Action, cmd.Value)
 
 	case "getasync":
 		r.wg.Add(2)
@@ -94,7 +92,7 @@ func (r *testRunner) execute(cmd testCommand) error {
 			// Ensure getStats is called by reading its return value.
 			// The value isn't checked because the code isn't designed
 			// to enforce order, so we can't reliably expect a certain avg.
-			r.cget <- r.obj.getStats()
+			r.cget <- r.Obj.Get()
 		}()
 		go func() {
 			defer r.wg.Done()
@@ -102,7 +100,7 @@ func (r *testRunner) execute(cmd testCommand) error {
 		}()
 
 	case "get":
-		return check(r.obj.getStats(), cmd.Action, cmd.Value)
+		return check(r.Obj.Get(), cmd.Action, cmd.Value)
 
 	default:
 		return fmt.Errorf("Unexpected command %s", cmd.Command)
