@@ -2,16 +2,14 @@ language: go
 go: "1.13.x"
 
 
-before_install:
-  - sudo apt-get -y install python3
-
-before_script:
-  - mkdir ./testdata/gen
-  - python3 ./tools/testgenerator.py --csv testdata/gen/tc_wr_mil_few_async.csv --add 1000000 jump run sit stand
-
 jobs:
-  - env: TEST_ARGS="-race"
+  - env: TEST_ARGS="-race -short"
   - env: TEST_ARGS="-coverprofile=coverage.txt -covermode=atomic"
+    before_install:
+      - sudo apt-get -y install python3
+    before_script:
+      - mkdir ./testdata/gen
+      - python3 ./tools/testgenerator.py --csv testdata/gen/tc_wr_mil_few_async.csv --add 1000000 jump run sit stand
     after_success: "bash <(curl -s https://codecov.io/bash)"
 
 script: "go test -v $TEST_ARGS"
