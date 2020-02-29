@@ -29,6 +29,10 @@ func TestWrFewAsync(t *testing.T) {
 	runTestCase("test/tc_wr_few_few_async.csv", t)
 }
 
+func TestBalFewAsync(t *testing.T) {
+	runTestCase("test/tc_bal_few_few_async.csv", t)
+}
+
 func TestWrMilAsync(t *testing.T) {
 	tc := "test/gen/tc_wr_mil_few_async.csv"
 	if !fileExists(tc) {
@@ -49,6 +53,7 @@ type testCommand struct {
 // runTestCase reads fn as a csv file containing test commands
 func runTestCase(fn string, t *testing.T) {
 	var impl statsImpl
+	var cstats = make(chan []outputMessage, 100)
 
 	csvfile, err := os.Open(fn)
 	if err != nil {
@@ -76,7 +81,7 @@ func runTestCase(fn string, t *testing.T) {
 		}
 
 		// Execute cmd
-		err = executeCommand(cmd, &impl)
+		err = executeCommand(cmd, &impl, cstats)
 		if err != nil {
 			t.Error(err)
 		}
@@ -102,7 +107,7 @@ func parseRecord(record []string) (testCommand, error) {
 }
 
 // executeCommand executes the given command on the passed *statsImpl
-func executeCommand(cmd testCommand, impl *statsImpl) error {
+func executeCommand(cmd testCommand, impl *statsImpl, cstats chan []outputMessage) error {
 	// Intepret command
 	switch cmd.Command {
 
@@ -121,6 +126,18 @@ func executeCommand(cmd testCommand, impl *statsImpl) error {
 	case "add":
 		msg := inputMessage{&cmd.Action, &cmd.Value}
 		impl.addAction(msg)
+
+	case "getasync":
+		wg.Add(2)
+		go func() {
+			defer wg.Done()
+			// Ensure getStats is called by reading its return value
+			cstats <- impl.getStats()
+		}()
+		go func() {
+			defer wg.Done()
+			<-cstats
+		}()
 
 	case "get":
 		return handleStats(impl.getStats(), cmd.Action, cmd.Value)
