@@ -25,13 +25,13 @@ type testRunner struct {
 	// wg is the WaitGroup for addasync and getasync commands
 	wg sync.WaitGroup
 
-	// cstats communicates getasync results
-	cstats chan []outputMessage
+	// cget communicates getasync results
+	cget chan []outputMessage
 }
 
 // Run loops over CsvFn, parses lines, and executes commands
 func (r *testRunner) Run() {
-	r.cstats = make(chan []outputMessage)
+	r.cget = make(chan []outputMessage)
 
 	csvfile, err := os.Open(r.CsvFn)
 	if err != nil {
@@ -94,11 +94,11 @@ func (r *testRunner) execute(cmd testCommand) error {
 			// Ensure getStats is called by reading its return value.
 			// The value isn't checked because the code isn't designed
 			// to enforce order, so we can't reliably expect a certain avg.
-			r.cstats <- r.obj.getStats()
+			r.cget <- r.obj.getStats()
 		}()
 		go func() {
 			defer r.wg.Done()
-			<-r.cstats
+			<-r.cget
 		}()
 
 	case "get":
