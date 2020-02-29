@@ -11,6 +11,7 @@ import (
 	"testing"
 )
 
+// wg is the WaitGroup for addasync and getasync commands
 var wg sync.WaitGroup
 
 // testCommand represents a line in a given test case
@@ -101,7 +102,9 @@ func executeCommand(cmd testCommand, impl *statsImpl, cstats chan []outputMessag
 		wg.Add(2)
 		go func() {
 			defer wg.Done()
-			// Ensure getStats is called by reading its return value
+			// Ensure getStats is called by reading its return value.
+			// The value isn't checked because the code isn't designed
+			// to enforce order, so we can't reliably expect a certain avg.
 			cstats <- impl.getStats()
 		}()
 		go func() {
