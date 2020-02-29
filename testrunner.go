@@ -11,109 +11,98 @@ import (
 	"testing"
 )
 
-// wg is the WaitGroup for addasync and getasync commands
-var wg sync.WaitGroup
+// testRunner encapsulates the functionality to run test case files
+type testRunner struct {
+	// CsvFn is the path to the test file
+	CsvFn string
 
-// testCommand represents a line in a given test case
-type testCommand struct {
-	Command string
-	Action  string
-	Value   float64
+	// TestT is the corresponding test handle
+	TestT *testing.T
+
+	// obj is the object under test
+	obj statsImpl
+
+	// wg is the WaitGroup for addasync and getasync commands
+	wg sync.WaitGroup
+
+	// cstats communicates getasync results
+	cstats chan []outputMessage
 }
 
-// runTestCase reads fn as a csv file containing test commands
-func runTestCase(fn string, t *testing.T) {
-	var impl statsImpl
-	var cstats = make(chan []outputMessage)
+// Run loops over CsvFn, parses lines, and executes commands
+func (r *testRunner) Run() {
+	r.cstats = make(chan []outputMessage)
 
-	csvfile, err := os.Open(fn)
+	csvfile, err := os.Open(r.CsvFn)
 	if err != nil {
-		t.Error(err)
-		t.FailNow()
+		r.TestT.Error(err)
+		r.TestT.FailNow()
 	}
 	defer csvfile.Close()
 
 	// Read file line by line
-	r := csv.NewReader(csvfile)
+	rdr := csv.NewReader(csvfile)
 	for {
-		record, err := r.Read()
+		record, err := rdr.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			t.Error(err)
+			r.TestT.Error(err)
 			continue
 		}
 
 		// Parse fields
-		cmd, err := parseRecord(record)
+		cmd, err := parse(record)
 		if err != nil {
-			t.Error(err)
+			r.TestT.Error(err)
 		}
 
 		// Execute cmd
-		err = executeCommand(cmd, &impl, cstats)
+		err = r.execute(cmd)
 		if err != nil {
-			t.Error(err)
+			r.TestT.Error(err)
 		}
 	}
 }
 
-// parseRecord attempts to parse an array of strings into a testCommand
-func parseRecord(record []string) (testCommand, error) {
-	var ret testCommand
-	if len(record) != 3 {
-		return ret, fmt.Errorf("Test case statements must be of form [<cmd>,<name>,<value>]")
-	}
-
-	cmd := record[0]
-	action := record[1]
-	val, err := strconv.ParseFloat(record[2], 64)
-	if err != nil {
-		return ret, err
-	}
-
-	ret = testCommand{cmd, action, val}
-	return ret, nil
-}
-
-// executeCommand executes the given command on the passed *statsImpl
-func executeCommand(cmd testCommand, impl *statsImpl, cstats chan []outputMessage) error {
+// execute executes the given command against the object under test
+func (r *testRunner) execute(cmd testCommand) error {
 	// Intepret command
 	switch cmd.Command {
 
 	case "sync":
-		wg.Wait()
+		r.wg.Wait()
 
 	case "addasync":
-		wg.Add(1)
+		r.wg.Add(1)
 		// Copies of action and value made as `cmd` may go out of scope
 		go func(action string, value float64) {
-			defer wg.Done()
+			defer r.wg.Done()
 			msg := inputMessage{&action, &value}
-			impl.addAction(msg)
+			r.obj.addAction(msg)
 		}(cmd.Action, cmd.Value)
 
 	case "add":
 		msg := inputMessage{&cmd.Action, &cmd.Value}
-		impl.addAction(msg)
+		r.obj.addAction(msg)
 
 	case "getasync":
-		wg.Add(2)
+		r.wg.Add(2)
 		go func() {
-			defer wg.Done()
+			defer r.wg.Done()
 			// Ensure getStats is called by reading its return value.
 			// The value isn't checked because the code isn't designed
 			// to enforce order, so we can't reliably expect a certain avg.
-			cstats <- impl.getStats()
+			r.cstats <- r.obj.getStats()
 		}()
 		go func() {
-			defer wg.Done()
-			<-cstats
+			defer r.wg.Done()
+			<-r.cstats
 		}()
 
 	case "get":
-		return handleStats(impl.getStats(), cmd.Action, cmd.Value)
+		return check(r.obj.getStats(), cmd.Action, cmd.Value)
 
 	default:
 		return fmt.Errorf("Unexpected command %s", cmd.Command)
@@ -122,7 +111,7 @@ func executeCommand(cmd testCommand, impl *statsImpl, cstats chan []outputMessag
 	return nil
 }
 
-func handleStats(stats []outputMessage, action string, value float64) error {
+func check(stats []outputMessage, action string, value float64) error {
 	const TOLERANCE = 0.000001
 	if action == "_len_" {
 		// Testing length
@@ -150,6 +139,31 @@ func handleStats(stats []outputMessage, action string, value float64) error {
 	}
 
 	return nil
+}
+
+// testCommand represents a line in a given test case
+type testCommand struct {
+	Command string
+	Action  string
+	Value   float64
+}
+
+// parse attempts to parse an array of strings into a testCommand
+func parse(record []string) (testCommand, error) {
+	var ret testCommand
+	if len(record) != 3 {
+		return ret, fmt.Errorf("Test case statements must be of form [<cmd>,<name>,<value>]")
+	}
+
+	cmd := record[0]
+	action := record[1]
+	val, err := strconv.ParseFloat(record[2], 64)
+	if err != nil {
+		return ret, err
+	}
+
+	ret = testCommand{cmd, action, val}
+	return ret, nil
 }
 
 // fileExists checks if a file exists and is not a directory before we
