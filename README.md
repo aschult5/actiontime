@@ -16,9 +16,9 @@ I have never before written *anything* in GoLang, but it has elegant support for
 This module is intended to be imported from a go program.
 
 ### Dependencies
-[go 1.13](https://golang.org/dl/) has been tested
-python3 is required to generate test cases
-[golint](https://github.com/golang/lint) is required for contributions
+* [go 1.13](https://golang.org/dl/) has been tested
+* python3 is required to generate test cases
+* [golint](https://github.com/golang/lint) is required for contributions
 
 ### Installation
 `go get github.com/aschult5/actiontime`
@@ -81,7 +81,7 @@ Possible output:
 Some test case files will need to be manually generated, as they create large files that probably don't belong in revision control.
 
 ### Generating Tests
-See `python3 ./tools/testgenerator.py --help`
+See `python3 ./tools/testgenerator.py --help`  
 Generated tests will have to be manually integrated by adding a new Test\* case to `statsimpl_test.go`
 
 ## Design
