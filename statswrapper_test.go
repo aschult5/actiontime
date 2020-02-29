@@ -50,6 +50,10 @@ func TestBalFewAsync(t *testing.T) {
 }
 
 func TestWrMilAsync(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	tc := "testdata/gen/tc_wr_mil_few_async.csv"
 	if !fileExists(tc) {
 		cmd := fmt.Sprintf("python3 tools/testgenerator.py --csv %s --add 1000000 jump run sit stand", tc)
