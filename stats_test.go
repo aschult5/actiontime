@@ -2,8 +2,77 @@ package actiontime
 
 import (
 	"encoding/json"
+	"fmt"
+	"math/rand"
 	"testing"
 )
+
+var getStatsRes string
+
+func BenchmarkGetStats100(b *testing.B) {
+	var s Stats
+	// Different action names will produce a larger output from GetStats
+	err := addDifferent(100, &s)
+	if err != nil {
+		b.Error(err)
+		b.FailNow()
+	}
+
+	// Read result locally and again globally to prevent optimization
+	// Ref: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
+	var r string
+	for n := 0; n < b.N; n++ {
+		r = s.GetStats()
+	}
+	getStatsRes = r
+}
+
+func BenchmarkAddAction100(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		s := Stats{}
+		err := addSame(100, &s)
+		if err != nil {
+			b.Error(err)
+			break
+		}
+	}
+}
+
+// addSame calls AddAction n times with the same action but different times
+func addSame(n int, s *Stats) error {
+	for i := 0; i < n; i++ {
+		err := s.AddAction(fmt.Sprintf(`{"action":"stand","time":%d}`, i))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// addDifferent calls AddAction n times with different actions and times
+func addDifferent(n int, s *Stats) error {
+	// Always seed with same value, we don't actually want random results
+	rand.Seed(42)
+
+	for i := 0; i < n; i++ {
+		action := randStringBytes(5)
+		err := s.AddAction(fmt.Sprintf(`{"action":"%s","time":%d}`, action, i))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// randStringBytes produces an English-alphabet string of length n
+func randStringBytes(n int) string {
+	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
+}
 
 func TestAddAction(t *testing.T) {
 	// Form a valid input string
