@@ -17,20 +17,20 @@ func TestEmpty(t *testing.T) {
 	runTestCase("test/tc_empty.csv", t)
 }
 
-func TestOneAdd(t *testing.T) {
-	runTestCase("test/tc_one_one.csv", t)
+func TestWrOne(t *testing.T) {
+	runTestCase("test/tc_wr_one_one.csv", t)
 }
 
-func TestFewAdds(t *testing.T) {
-	runTestCase("test/tc_few_few.csv", t)
+func TestWrFew(t *testing.T) {
+	runTestCase("test/tc_wr_few_few.csv", t)
 }
 
-func TestFewAsync(t *testing.T) {
-	runTestCase("test/tc_few_few_async.csv", t)
+func TestWrFewAsync(t *testing.T) {
+	runTestCase("test/tc_wr_few_few_async.csv", t)
 }
 
-func TestMilAsync(t *testing.T) {
-	tc := "test/gen/tc_mil_few_async.csv"
+func TestWrMilAsync(t *testing.T) {
+	tc := "test/gen/tc_wr_mil_few_async.csv"
 	if !fileExists(tc) {
 		cmd := fmt.Sprintf("python3 tools/testgenerator.py --csv %s --add 1000000 jump run sit stand", tc)
 		t.Errorf("Please generate %s with...\n`%s`", tc, cmd)
