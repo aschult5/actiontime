@@ -1,6 +1,10 @@
 language: go
 go: "1.13.x"
 
+env:
+  - TEST_ARGS="-race"
+  - TEST_ARGS="-coverprofile=coverage.txt -covermode=atomic"
+
 before_install:
   - sudo apt-get -y install python3
 
@@ -8,8 +12,7 @@ before_script:
   - mkdir ./test/gen
   - python3 ./tools/testgenerator.py --csv test/gen/tc_mil_few_async.csv --add 1000000 jump run sit stand
 
-script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic
+script: "go test $TEST_ARGS"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
