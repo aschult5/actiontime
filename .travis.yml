@@ -11,6 +11,8 @@ jobs:
     before_script:
       - mkdir ./testdata/gen
       - python3 ./tools/testgenerator.py --csv testdata/gen/tc_wr_mil_few_async.csv --add 1000000 jump run sit stand
-    after_success: "bash <(curl -s https://codecov.io/bash)"
+    after_success: 
+      - go tool cover -func coverage.txt
+      - bash <(curl -s https://codecov.io/bash)
 
 script: "go test -v $TEST_ARGS"
