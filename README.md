@@ -86,8 +86,8 @@ Generated tests will have to be manually integrated by adding a new Test\* case 
 
 ## Design
 ### Assumptions
-* `time` may only be a non-zero json number that fits into a float64
-* `action` may only be a non-empty json string
+* `time` may only be a json number greater than 0 that fits into a float64
+* `action` may only be a json string of length between 1 and `actiontime.MaxActionLen` characters
 * Case-insensitive keys; duplicate normalized keys will follow [go's preference](https://blog.golang.org/json-and-go)
 * Case-sensitive values
 * Extra fields can be ignored
@@ -108,4 +108,3 @@ See github.com/aschult5/actiontime/issues
   1. Asynchronously handling calls to AddAction (Issue #23)
   2. Handling calls to GetStats in O(1) (Issue #21)
 * Better test coverage under load (Issue #28)
-* Better input validation (Issues #30, #32)

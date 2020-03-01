@@ -16,10 +16,15 @@ type Stats struct {
 // ErrBadInput indicates malformed input
 var ErrBadInput = errors.New("actiontime: Malformed input data")
 
+// MaxActionLen indicates the max length of an input action string
+var MaxActionLen = 32
+
 // AddAction takes json input and updates the action's time average.
 // Example input: `{"action":"jump", "time": 100}`
 // Keys are case insensitive.
 // String values are case sensitive.
+// 'action' cannot be empty or longer than 32 characters.
+// 'time' must be greater than 0 and not overflow float64.
 // Returns json.UnmarshalTypeError or actiontime.ErrBadInput on failure.
 func (a *Stats) AddAction(input string) error {
 	var msg inputMessage
@@ -29,7 +34,7 @@ func (a *Stats) AddAction(input string) error {
 		return err
 	}
 
-	if len(msg.Action) == 0 || msg.Time == 0 {
+	if len(msg.Action) == 0 || len(msg.Action) > MaxActionLen || msg.Time <= 0 {
 		return ErrBadInput
 	}
 
