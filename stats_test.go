@@ -8,34 +8,117 @@ import (
 	"testing"
 )
 
+//
+// Benchmarks
+//
+
+// Results must be read globally to prevent benchmark optimization
+// Ref: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
 var getStatsRes string
 
-func BenchmarkGetStats100(b *testing.B) {
-	var s Stats
-	// Different action names will produce a larger output from GetStats
-	err := addDifferent(100, &s)
-	if err != nil {
-		b.Error(err)
-		b.FailNow()
+func BenchmarkGetStats(b *testing.B) {
+	// Define GetStats benchmark table
+	benchmarks := []struct {
+		name   string
+		numAct int
+		numGo  int
+	}{
+		{"100Action_0Go", 100, 0},
+		{"100Action_2Go", 100, 2},
+		{"100Action_4Go", 100, 4},
+		{"100Action_8Go", 100, 8},
 	}
 
-	// Read result locally and again globally to prevent optimization
-	// Ref: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
-	var r string
-	for n := 0; n < b.N; n++ {
-		r = s.GetStats()
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			var s Stats
+			// Different action names will produce a larger output from GetStats
+			err := addDifferent(bm.numAct, &s)
+			if err != nil {
+				b.Error(err)
+				return
+			}
+
+			var getFun func()
+			var sem chan bool
+			if bm.numGo <= 0 {
+				// Don't spawn goroutines
+				getFun = func() {
+					getStatsRes = s.GetStats()
+				}
+			} else {
+				// Limit number of running goroutines with a semaphore
+				sem = make(chan bool, bm.numGo)
+				getFun = func() {
+					sem <- true
+					go func() {
+						defer func() { <-sem }()
+						getStatsRes = s.GetStats()
+					}()
+				}
+			}
+
+			for n := 0; n < b.N; n++ {
+				getFun()
+			}
+			// Wait for remaining goroutines
+			for i := 0; i < cap(sem); i++ {
+				sem <- true
+			}
+		})
 	}
-	getStatsRes = r
 }
 
-func BenchmarkAddAction100(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		s := Stats{}
-		err := addSame(100, &s)
-		if err != nil {
-			b.Error(err)
-			break
-		}
+func BenchmarkAddAction(b *testing.B) {
+	// Define AddAction benchmark table
+	benchmarks := []struct {
+		name   string
+		numAdd int
+		numGo  int
+	}{
+		{"100Add_0Go", 100, 0},
+		{"100Add_2Go", 100, 2},
+		{"100Add_4Go", 100, 4},
+		{"100Add_8Go", 100, 8},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			var s Stats
+
+			var addFun func()
+			var sem chan bool
+			if bm.numGo <= 0 {
+				// Don't spawn goroutines
+				addFun = func() {
+					err := addSame(bm.numAdd, &s)
+					if err != nil {
+						b.Error(err)
+					}
+				}
+			} else {
+				// Limit number of running goroutines with a semaphore
+				sem = make(chan bool, bm.numGo)
+				addFun = func() {
+					sem <- true
+					go func() {
+						defer func() { <-sem }()
+						err := addSame(bm.numAdd, &s)
+						if err != nil {
+							b.Error(err)
+						}
+					}()
+				}
+			}
+
+			for n := 0; n < b.N; n++ {
+				addFun()
+			}
+			// Wait for remaining goroutines
+			for i := 0; i < cap(sem); i++ {
+				sem <- true
+			}
+		})
 	}
 }
 
@@ -64,6 +147,10 @@ func addDifferent(n int, s *Stats) error {
 	}
 	return nil
 }
+
+//
+// Tests
+//
 
 // randStringBytes produces an English-alphabet string of length n
 func randStringBytes(n int) string {
