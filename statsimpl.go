@@ -1,7 +1,7 @@
 package actiontime
 
 import (
-	average "github.com/aschult5/actiontime/average"
+	"github.com/aschult5/actiontime/average"
 	"sync"
 )
 
