@@ -30,8 +30,35 @@ func benchmarkGetStats(b *testing.B, numAct int, getFun func(*Stats)) {
 	}
 }
 
+func benchmarkGetStatsGo(b *testing.B, numAct int, numGo int) {
+	if numGo <= 0 {
+		b.FailNow()
+	}
+
+	// Limit number of running goroutines with a semaphore
+	sem := make(chan bool, numGo)
+	getFun := func(s *Stats) {
+		sem <- true
+		go func() {
+			defer func() { <-sem }()
+			getStatsRes = s.GetStats()
+		}()
+	}
+
+	benchmarkGetStats(b, numAct, getFun)
+
+	// Wait for remaining goroutines
+	for i := 0; i < numGo; i++ {
+		sem <- true
+	}
+}
+
 func BenchmarkGetStats100(b *testing.B) {
 	benchmarkGetStats(b, 100, func(s *Stats) { getStatsRes = s.GetStats() })
+}
+
+func BenchmarkGetStats100Async4(b *testing.B) {
+	benchmarkGetStatsGo(b, 100, 4)
 }
 
 func BenchmarkAddAction100(b *testing.B) {
