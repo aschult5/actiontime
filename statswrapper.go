@@ -44,7 +44,7 @@ type statsImplWrap struct {
 }
 
 func (s *statsImplWrap) Add(action string, value float64) {
-	msg := inputMessage{&action, &value}
+	msg := inputMessage{action, value}
 	s.addAction(msg)
 }
 

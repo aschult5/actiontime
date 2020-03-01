@@ -40,7 +40,7 @@ func BenchmarkAddAction100(b *testing.B) {
 
 // addSame calls AddAction n times with the same action but different times
 func addSame(n int, s *Stats) error {
-	for i := 0; i < n; i++ {
+	for i := 1; i <= n; i++ {
 		err := s.AddAction(fmt.Sprintf(`{"action":"stand","time":%d}`, i))
 		if err != nil {
 			return err
@@ -54,7 +54,7 @@ func addDifferent(n int, s *Stats) error {
 	// Always seed with same value, we don't actually want random results
 	rand.Seed(42)
 
-	for i := 0; i < n; i++ {
+	for i := 1; i <= n; i++ {
 		action := randStringBytes(5)
 		err := s.AddAction(fmt.Sprintf(`{"action":"%s","time":%d}`, action, i))
 		if err != nil {
@@ -78,7 +78,7 @@ func TestAddAction(t *testing.T) {
 	// Form a valid input string
 	action := "jump"
 	var time float64 = 100
-	str := getInputMessageString(&action, &time)
+	str := getInputMessageString(action, time)
 
 	// Verify valid inputMessage doesn't produce an error
 	obj := Stats{}
@@ -120,6 +120,14 @@ func TestUnexpectedJson(t *testing.T) {
 	}
 }
 
+func TestEmptyAction(t *testing.T) {
+	obj := Stats{}
+	err := obj.AddAction(`{"action": "", "time": 1}`)
+	if err != ErrBadInput {
+		t.Error("Didn't detect empty action string")
+	}
+}
+
 func TestNullJson(t *testing.T) {
 	obj := Stats{}
 	err := obj.AddAction("null")
@@ -140,7 +148,7 @@ func TestAddAndGet(t *testing.T) {
 	// Form a valid input string
 	action := "jump"
 	var time float64 = 100
-	istr := getInputMessageString(&action, &time)
+	istr := getInputMessageString(action, time)
 
 	// Add the action
 	obj := Stats{}
@@ -165,7 +173,7 @@ func TestAddAndGet(t *testing.T) {
 }
 
 // getInputMessageString converts valid message values to a json string
-func getInputMessageString(action *string, time *float64) string {
+func getInputMessageString(action string, time float64) string {
 	msg := inputMessage{action, time}
 	b, _ := json.Marshal(msg)
 	return string(b)

@@ -29,7 +29,7 @@ func (a *Stats) AddAction(input string) error {
 		return err
 	}
 
-	if msg.Action == nil || msg.Time == nil {
+	if len(msg.Action) == 0 || msg.Time == 0 {
 		return ErrBadInput
 	}
 

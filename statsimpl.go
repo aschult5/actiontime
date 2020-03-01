@@ -19,9 +19,9 @@ func (impl *statsImpl) addAction(msg inputMessage) {
 	if len(impl.avg) == 0 {
 		impl.avg = make(map[string]average.Running)
 	}
-	avg := impl.avg[*msg.Action]
-	avg.Add(*msg.Time)
-	impl.avg[*msg.Action] = avg
+	avg := impl.avg[msg.Action]
+	avg.Add(msg.Time)
+	impl.avg[msg.Action] = avg
 }
 
 // getStats implements Stats.GetStats
