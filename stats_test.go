@@ -16,49 +16,55 @@ import (
 // Ref: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
 var getStatsRes string
 
-func benchmarkGetStats(b *testing.B, numAct int, getFun func(*Stats)) {
-	var s Stats
-	// Different action names will produce a larger output from GetStats
-	err := addDifferent(numAct, &s)
-	if err != nil {
-		b.Error(err)
-		b.FailNow()
+func BenchmarkGetStats(b *testing.B) {
+	// Define GetStats benchmark table
+	benchmarks := []struct {
+		name   string
+		numAct int
+		numGo  int
+	}{
+		{"100Action_0Go", 100, 0},
+		{"100Action_4Go", 100, 4},
 	}
 
-	for n := 0; n < b.N; n++ {
-		getFun(&s)
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			var s Stats
+			// Different action names will produce a larger output from GetStats
+			err := addDifferent(bm.numAct, &s)
+			if err != nil {
+				b.Error(err)
+				return
+			}
+
+			var getFun func()
+			var sem chan bool
+			if bm.numGo <= 0 {
+				// Don't spawn goroutines
+				getFun = func() {
+					getStatsRes = s.GetStats()
+				}
+			} else {
+				// Limit number of running goroutines with a semaphore
+				sem = make(chan bool, bm.numGo)
+				getFun = func() {
+					sem <- true
+					go func() {
+						defer func() { <-sem }()
+						getStatsRes = s.GetStats()
+					}()
+				}
+			}
+
+			for n := 0; n < b.N; n++ {
+				getFun()
+			}
+			// Wait for remaining goroutines
+			for i := 0; i < cap(sem); i++ {
+				sem <- true
+			}
+		})
 	}
-}
-
-func benchmarkGetStatsGo(b *testing.B, numAct int, numGo int) {
-	if numGo <= 0 {
-		b.FailNow()
-	}
-
-	// Limit number of running goroutines with a semaphore
-	sem := make(chan bool, numGo)
-	getFun := func(s *Stats) {
-		sem <- true
-		go func() {
-			defer func() { <-sem }()
-			getStatsRes = s.GetStats()
-		}()
-	}
-
-	benchmarkGetStats(b, numAct, getFun)
-
-	// Wait for remaining goroutines
-	for i := 0; i < numGo; i++ {
-		sem <- true
-	}
-}
-
-func BenchmarkGetStats100(b *testing.B) {
-	benchmarkGetStats(b, 100, func(s *Stats) { getStatsRes = s.GetStats() })
-}
-
-func BenchmarkGetStats100Async4(b *testing.B) {
-	benchmarkGetStatsGo(b, 100, 4)
 }
 
 func BenchmarkAddAction100(b *testing.B) {
@@ -70,11 +76,8 @@ func BenchmarkAddAction100(b *testing.B) {
 			break
 		}
 	}
-}
 
-//
-// Tests
-//
+}
 
 // addSame calls AddAction n times with the same action but different times
 func addSame(n int, s *Stats) error {
@@ -101,6 +104,10 @@ func addDifferent(n int, s *Stats) error {
 	}
 	return nil
 }
+
+//
+// Tests
+//
 
 // randStringBytes produces an English-alphabet string of length n
 func randStringBytes(n int) string {
