@@ -8,24 +8,30 @@ import (
 	"testing"
 )
 
+//
+// Benchmarks
+//
+
+// Results must be read globally to prevent benchmark optimization
+// Ref: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
 var getStatsRes string
 
-func BenchmarkGetStats100(b *testing.B) {
+func benchmarkGetStats(b *testing.B, numAct int, getFun func(*Stats)) {
 	var s Stats
 	// Different action names will produce a larger output from GetStats
-	err := addDifferent(100, &s)
+	err := addDifferent(numAct, &s)
 	if err != nil {
 		b.Error(err)
 		b.FailNow()
 	}
 
-	// Read result locally and again globally to prevent optimization
-	// Ref: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
-	var r string
 	for n := 0; n < b.N; n++ {
-		r = s.GetStats()
+		getFun(&s)
 	}
-	getStatsRes = r
+}
+
+func BenchmarkGetStats100(b *testing.B) {
+	benchmarkGetStats(b, 100, func(s *Stats) { getStatsRes = s.GetStats() })
 }
 
 func BenchmarkAddAction100(b *testing.B) {
@@ -38,6 +44,10 @@ func BenchmarkAddAction100(b *testing.B) {
 		}
 	}
 }
+
+//
+// Tests
+//
 
 // addSame calls AddAction n times with the same action but different times
 func addSame(n int, s *Stats) error {
