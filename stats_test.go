@@ -104,10 +104,10 @@ func TestExtraJson(t *testing.T) {
 	}
 }
 
-func TestMissingJson(t *testing.T) {
+func TestBadJson(t *testing.T) {
 	obj := Stats{}
 	err := obj.AddAction(`{"action": "jump"}`)
-	if err != ErrMissingInput {
+	if err != ErrBadInput {
 		t.Error("Didn't detect missing parameter")
 	}
 }
@@ -123,7 +123,7 @@ func TestUnexpectedJson(t *testing.T) {
 func TestNullJson(t *testing.T) {
 	obj := Stats{}
 	err := obj.AddAction("null")
-	if err != ErrMissingInput {
+	if err != ErrBadInput {
 		t.Error("Didn't detect null json")
 	}
 }
