@@ -24,7 +24,9 @@ func BenchmarkGetStats(b *testing.B) {
 		numGo  int
 	}{
 		{"100Action_0Go", 100, 0},
+		{"100Action_2Go", 100, 2},
 		{"100Action_4Go", 100, 4},
+		{"100Action_8Go", 100, 8},
 	}
 
 	for _, bm := range benchmarks {
@@ -75,7 +77,9 @@ func BenchmarkAddAction(b *testing.B) {
 		numGo  int
 	}{
 		{"100Add_0Go", 100, 0},
+		{"100Add_2Go", 100, 2},
 		{"100Add_4Go", 100, 4},
+		{"100Add_8Go", 100, 8},
 	}
 
 	for _, bm := range benchmarks {
