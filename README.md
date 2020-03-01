@@ -80,6 +80,10 @@ Possible output:
 
 Some test case files will need to be manually generated, as they create large files that probably don't belong in revision control.
 
+### Running Benchmarks
+### Checking code coverage
+
+
 ### Generating Tests
 See `python3 ./tools/testgenerator.py --help`  
 Generated tests will have to be manually integrated by adding a new Test\* case to `statsimpl_test.go`
@@ -94,10 +98,10 @@ Generated tests will have to be manually integrated by adding a new Test\* case 
 * The set of valid `action` values is reasonably small, i.e. will fit into memory
 * No need to persist inputs
 * No need to track of the sums of `time` values
-* Result of `getStats` does not need to be strictly chronologically-accurate
+* Result of `GetStats` does not need to be strictly chronologically-accurate
   * Rationale:
-    1. No indication that `addAction` should be treated as a sensitive transaction, e.g. a bank deposit or withdrawal
-    2. Averages are fuzzy by nature and in the long run individual calls to `addAction` will have little effect
+    1. No indication that `AddAction` should be treated as a sensitive transaction, e.g. a bank deposit or withdrawal
+    2. Averages are fuzzy by nature and in the long run individual calls to `AddAction` will have little effect
 * Caller is responsible for formatting result of `GetStats`
 
 ## TODO
@@ -106,5 +110,4 @@ See github.com/aschult5/actiontime/issues
 ### Notable improvements
 * Improve performance by...
   1. Asynchronously handling calls to AddAction (Issue #23)
-  2. Handling calls to GetStats in O(1) (Issue #21)
 * Better test coverage under load (Issue #28)
