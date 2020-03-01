@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 	"testing"
 )
 
@@ -125,6 +126,40 @@ func TestEmptyAction(t *testing.T) {
 	err := obj.AddAction(`{"action": "", "time": 1}`)
 	if err != ErrBadInput {
 		t.Error("Didn't detect empty action string")
+	}
+}
+
+func TestLongActionName(t *testing.T) {
+	obj := Stats{}
+
+	// Test long but acceptable action name
+	long := strings.Repeat("a", MaxActionLen)
+	err := obj.AddAction(fmt.Sprintf(`
+		{
+		"action": "%s",
+		"time": 1
+		}`, long))
+	if err != nil {
+		t.Error("Didn't allow MaxActionLen string")
+	}
+
+	// Test toolong of an action name
+	toolong := strings.Repeat("b", MaxActionLen+1)
+	err = obj.AddAction(fmt.Sprintf(`
+		{
+		"action": "%s",
+		"time": 1
+		}`, toolong))
+	if err != ErrBadInput {
+		t.Error("Didn't detect long action string")
+	}
+}
+
+func TestNegativeTime(t *testing.T) {
+	obj := Stats{}
+	err := obj.AddAction(`{"action": "jump", "time": -1}`)
+	if err != ErrBadInput {
+		t.Error("Didn't detect negative time")
 	}
 }
 
