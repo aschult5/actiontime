@@ -87,7 +87,7 @@ Some test case files will need to be manually generated, as they create large fi
 go test -bench . -benchmem -benchtime 10s -run=^$
 ```
 
-See [travis-ci](https://travis-ci.com/aschult5/actiontime) for latest benchmark results.
+See [travis-ci](https://travis-ci.com/aschult5/actiontime) for latest benchmark results on a single core.
 
 ### Checking code coverage
 ```bash
@@ -101,7 +101,18 @@ See `python3 ./tools/testgenerator.py --help`
 Generated tests will have to be manually integrated by adding a new Test\* case to `statsimpl_test.go`
 
 ## Design
+### Decisions
+* RWMutex was chosen due to this problem's close relationship with the [readers-writers problem](https://en.m.wikipedia.org/wiki/Readers%E2%80%93writers_problem).
+  * Some experimenting was done with using a channel instead, but initial benchmarks showed that the RWMutex solution generally outperformed. More testing is needed.
+* `actiontime.statsImpl` exists to separate the interface from its implementation. This reduces `actiontime.Stats` to a simple message transcoder and input validator.
+*  testgenerator.py was written before I discovered how easy it is to write test tables in Go. Under the same circumstances, I would choose the test tables next time. Benchmarks were written as tables.
+*  statsWrapper was written to offer a common test interface between Stats and statsImpl, which allows the same test cases to be run against each.
+  * Ideally I would unit test each method independently, using mocked dependencies to simulate behavior, and then integrate test against the exported methods. However, I have limited time and nothing to integrate.
+  * Having proper unit tests and integration tests would eliminate the usefulness of statsWrapper
+
+
 ### Assumptions
+
 * `time` may only be a json number greater than 0 that fits into a float64
 * `action` may only be a json string of length between 1 and `actiontime.MaxActionLen` characters
 * Case-insensitive keys; duplicate normalized keys will follow [go's preference](https://blog.golang.org/json-and-go)
