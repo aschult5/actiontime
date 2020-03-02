@@ -15,4 +15,4 @@ jobs:
       - go tool cover -func coverage.txt
       - bash <(curl -s https://codecov.io/bash)
 
-script: "go test -v $TEST_ARGS"
+script: "go test -v $TEST_ARGS ./..."
