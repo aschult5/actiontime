@@ -148,10 +148,6 @@ func addDifferent(n int, s *Stats) error {
 	return nil
 }
 
-//
-// Tests
-//
-
 // randStringBytes produces an English-alphabet string of length n
 func randStringBytes(n int) string {
 	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -162,17 +158,33 @@ func randStringBytes(n int) string {
 	return string(b)
 }
 
+//
+// Tests
+//
 func TestAddAction(t *testing.T) {
-	// Form a valid input string
-	action := "jump"
-	var time float64 = 100
-	str := getInputMessageString(action, time)
+	testCases := []struct {
+		name  string
+		input string
+		err   error
+	}{
+		{"Good", `{"action":"jump","time":100}`, nil},
+		{"ExtraJson", `{"action": "jump", "time": 100, "extra": "value"}`, nil},
+		{"NullJson", `null`, ErrBadInput},
+		{"MissingField", `{"action": "jump"}`, ErrBadInput},
+		{"EmptyAction", `{"action": "", "time": 100}`, ErrBadInput},
+		{"LongAction", fmt.Sprintf(`{"action": "%s", "time": 100}`, strings.Repeat("a", MaxActionLen)), nil},
+		{"TooLongAction", fmt.Sprintf(`{"action": "%s", "time": 100}`, strings.Repeat("b", MaxActionLen+1)), ErrBadInput},
+		{"NegativeTime", `{"action": "jump", "time": -1}`, ErrBadInput},
+	}
 
-	// Verify valid inputMessage doesn't produce an error
-	obj := Stats{}
-	err := obj.AddAction(str)
-	if err != nil {
-		t.Error(err)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Verify result of input matches expected error
+			var obj Stats
+			if err := obj.AddAction(tc.input); err != tc.err {
+				t.Errorf(`Got: "%s"\nExpected: "%s"`, err, tc.err)
+			}
+		})
 	}
 }
 
@@ -184,77 +196,11 @@ func TestInvalidJson(t *testing.T) {
 	}
 }
 
-func TestExtraJson(t *testing.T) {
-	obj := Stats{}
-	err := obj.AddAction(`{"action": "jump", "time": 100, "extra": "value"}`)
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestBadJson(t *testing.T) {
-	obj := Stats{}
-	err := obj.AddAction(`{"action": "jump"}`)
-	if err != ErrBadInput {
-		t.Error("Didn't detect missing parameter")
-	}
-}
-
 func TestUnexpectedJson(t *testing.T) {
 	obj := Stats{}
 	err := obj.AddAction(`{"action": 1, "time": 1}`)
 	if _, ok := err.(*json.UnmarshalTypeError); !ok {
 		t.Error("Didn't detect unexpected json")
-	}
-}
-
-func TestEmptyAction(t *testing.T) {
-	obj := Stats{}
-	err := obj.AddAction(`{"action": "", "time": 1}`)
-	if err != ErrBadInput {
-		t.Error("Didn't detect empty action string")
-	}
-}
-
-func TestLongActionName(t *testing.T) {
-	obj := Stats{}
-
-	// Test long but acceptable action name
-	long := strings.Repeat("a", MaxActionLen)
-	err := obj.AddAction(fmt.Sprintf(`
-		{
-		"action": "%s",
-		"time": 1
-		}`, long))
-	if err != nil {
-		t.Error("Didn't allow MaxActionLen string")
-	}
-
-	// Test toolong of an action name
-	toolong := strings.Repeat("b", MaxActionLen+1)
-	err = obj.AddAction(fmt.Sprintf(`
-		{
-		"action": "%s",
-		"time": 1
-		}`, toolong))
-	if err != ErrBadInput {
-		t.Error("Didn't detect long action string")
-	}
-}
-
-func TestNegativeTime(t *testing.T) {
-	obj := Stats{}
-	err := obj.AddAction(`{"action": "jump", "time": -1}`)
-	if err != ErrBadInput {
-		t.Error("Didn't detect negative time")
-	}
-}
-
-func TestNullJson(t *testing.T) {
-	obj := Stats{}
-	err := obj.AddAction("null")
-	if err != ErrBadInput {
-		t.Error("Didn't detect null json")
 	}
 }
 
