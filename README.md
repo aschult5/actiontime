@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.com/aschult5/actiontime.svg?branch=master)](https://travis-ci.com/aschult5/actiontime)
 [![codecov](https://codecov.io/gh/aschult5/actiontime/branch/master/graph/badge.svg)](https://codecov.io/gh/aschult5/actiontime)
 
-A simple Golang library that accepts a json serialized string of the form below and maintains an average time for each action.
+A thread-safe Golang library that accepts a json serialized string of the form below and maintains an average time for each action.
 ```json
 {"action":"jump", "time":100}
 {"action":"run", "time":75}
@@ -13,7 +13,8 @@ A simple Golang library that accepts a json serialized string of the form below 
 I have never before written *anything* in GoLang, but it has elegant support for concurrency and json, which are core aspects of this project. It is also used by the folks that will be inspecting this project. You've been warned!
 
 ## Usage
-This module is intended to be imported from a go program.
+This module is intended to be imported from a go program.  
+Calls to `AddAction` and `GetStats` may be made concurrently.
 
 ### Dependencies
 * [go 1.13](https://golang.org/dl/) has been tested
@@ -77,11 +78,12 @@ Possible output:
 ## Testing
 ### Running Tests
 ```bash
-go test [-race] [-short]
+go test [-v] [-race] [-short]
 ```
-
-Some test case files will need to be manually generated, as they create large files that probably don't belong in revision control.
 **Note**:  Testing`-race` without `-short` may timeout.
+
+Some test case files will need to be manually generated, as they create large files that probably don't belong in revision control.  
+You will be prompted with the command if you run `go test`.  
 
 ### Running Benchmarks
 ```bash
@@ -107,6 +109,7 @@ Generated tests will have to be manually integrated by adding a new Test\* case 
   * Some experimenting was done with using a channel instead, but initial benchmarks showed that the RWMutex solution generally outperformed. More testing is needed.
 * `actiontime.statsImpl` exists to separate the interface from its implementation. This reduces `actiontime.Stats` to a simple message transcoder and input validator.
 *  testgenerator.py was written before I discovered how easy it is to write test tables in Go. Under the same circumstances, I would choose the test tables next time. Benchmarks were written as tables.
+  * Test tables would eliminate the usefulness of testgenerator and likely testrunner
 *  statsWrapper was written to offer a common test interface between Stats and statsImpl, which allows the same test cases to be run against each.
   * Ideally I would unit test each method independently, using mocked dependencies to simulate behavior, and then integrate test against the exported methods. However, I have limited time and nothing to integrate.
   * Having proper unit tests and integration tests would eliminate the usefulness of statsWrapper
@@ -132,6 +135,5 @@ Generated tests will have to be manually integrated by adding a new Test\* case 
 See github.com/aschult5/actiontime/issues
 
 ### Notable improvements
-* Improve performance by...
-  1. Asynchronously handling calls to AddAction (Issue #23)
-* Better test coverage under load (Issue #28)
+* Replace testgenerator and testrunner with a test table (issue #41)
+* Improve stress/benchmark coverage (issue #28)
