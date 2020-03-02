@@ -10,7 +10,12 @@ jobs:
       - sudo apt-get -y install python3
     before_script:
       - mkdir ./testdata/gen
-      - python3 ./tools/testgenerator.py --csv testdata/gen/tc_wr_mil_few_async.csv --add 1000000 jump run sit stand
+      - python3 tools/testgenerator.py --balance read     --csv testdata/gen/tc_rd_mil_one_async.csv --add 1000000 jump
+      - python3 tools/testgenerator.py --balance read     --csv testdata/gen/tc_rd_mil_few_async.csv --add 1000000 jump run sit stand
+      - python3 tools/testgenerator.py --balance write    --csv testdata/gen/tc_wr_mil_one_async.csv --add 1000000 jump
+      - python3 tools/testgenerator.py --balance write    --csv testdata/gen/tc_wr_mil_few_async.csv --add 1000000 jump run sit stand
+      - python3 tools/testgenerator.py --balance balanced --csv testdata/gen/tc_bal_100k_one_async.csv --add 100000 jump
+      - python3 tools/testgenerator.py --balance balanced --csv testdata/gen/tc_bal_100k_few_async.csv --add 100000 jump run sit stand
     after_success: 
       - go tool cover -func coverage.txt
       - bash <(curl -s https://codecov.io/bash)

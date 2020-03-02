@@ -61,3 +61,78 @@ func TestWrMilAsync(t *testing.T) {
 		testStats(t, tc)
 	}
 }
+
+func TestRdMilAsync(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	tc := "testdata/gen/tc_rd_mil_few_async.csv"
+	if !fileExists(tc) {
+		cmd := fmt.Sprintf("python3 tools/testgenerator.py --balance read --csv %s --add 1000000 jump run sit stand", tc)
+		t.Errorf("Please generate %s with...\n%s", tc, cmd)
+	} else {
+		testStatsImpl(t, tc)
+		testStats(t, tc)
+	}
+}
+
+func TestBal100kAsync(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	tc := "testdata/gen/tc_bal_100k_few_async.csv"
+	if !fileExists(tc) {
+		cmd := fmt.Sprintf("python3 tools/testgenerator.py --balance balanced --csv %s --add 100000 jump run sit stand", tc)
+		t.Errorf("Please generate %s with...\n%s", tc, cmd)
+	} else {
+		testStatsImpl(t, tc)
+		testStats(t, tc)
+	}
+}
+
+func TestWrMilOneAsync(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	tc := "testdata/gen/tc_wr_mil_one_async.csv"
+	if !fileExists(tc) {
+		cmd := fmt.Sprintf("python3 tools/testgenerator.py --balance write --csv %s --add 1000000 jump", tc)
+		t.Errorf("Please generate %s with...\n%s", tc, cmd)
+	} else {
+		testStatsImpl(t, tc)
+		testStats(t, tc)
+	}
+}
+
+func TestRdMilOneAsync(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	tc := "testdata/gen/tc_rd_mil_one_async.csv"
+	if !fileExists(tc) {
+		cmd := fmt.Sprintf("python3 tools/testgenerator.py --balance read --csv %s --add 1000000 jump", tc)
+		t.Errorf("Please generate %s with...\n%s", tc, cmd)
+	} else {
+		testStatsImpl(t, tc)
+		testStats(t, tc)
+	}
+}
+
+func TestBal100kOneAsync(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	tc := "testdata/gen/tc_bal_100k_one_async.csv"
+	if !fileExists(tc) {
+		cmd := fmt.Sprintf("python3 tools/testgenerator.py --balance balanced --csv %s --add 100000 jump", tc)
+		t.Errorf("Please generate %s with...\n%s", tc, cmd)
+	} else {
+		testStatsImpl(t, tc)
+		testStats(t, tc)
+	}
+}
