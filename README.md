@@ -32,11 +32,12 @@ package actiontime // import "github.com/aschult5/actiontime"
 Package actiontime takes actions and times as json, tracking average times.
 Input is received as a json string, per requirements.
 
-var ErrMissingInput = errors.New("actiontime: Missing input data")
+var ErrBadInput = errors.New("actiontime: Malformed input data")
+var MaxActionLen = 32
 type Stats struct{ ... }
 ```
 
-From `go doc Stats`
+From `go doc actiontime.Stats`
 ```go
 package actiontime // import "github.com/aschult5/actiontime"
 
