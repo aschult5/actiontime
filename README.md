@@ -77,10 +77,11 @@ Possible output:
 ## Testing
 ### Running Tests
 ```bash
-go test [-race]
+go test [-race] [-short]
 ```
 
 Some test case files will need to be manually generated, as they create large files that probably don't belong in revision control.
+**Note**:  Testing`-race` without `-short` may timeout.
 
 ### Running Benchmarks
 ```bash
@@ -97,7 +98,7 @@ go tool cover -func coverage.txt
 See [codecov](https://codecov.io/gh/aschult5/actiontime) for code coverage history.
 
 ### Generating Tests
-See `python3 ./tools/testgenerator.py --help`  
+See `python3 ./tools/testgenerator.py --help`
 Generated tests will have to be manually integrated by adding a new Test\* case to `statsimpl_test.go`
 
 ## Design
