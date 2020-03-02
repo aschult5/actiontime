@@ -54,8 +54,8 @@ func TestWrMilAsync(t *testing.T) {
 
 	tc := "testdata/gen/tc_wr_mil_few_async.csv"
 	if !fileExists(tc) {
-		cmd := fmt.Sprintf("python3 tools/testgenerator.py --csv %s --add 1000000 jump run sit stand", tc)
-		t.Errorf("Please generate %s with...\n`%s`", tc, cmd)
+		cmd := fmt.Sprintf("python3 tools/testgenerator.py --balance write --csv %s --add 1000000 jump run sit stand", tc)
+		t.Errorf("Please generate %s with...\n%s", tc, cmd)
 	} else {
 		testStatsImpl(t, tc)
 		testStats(t, tc)
