@@ -6,17 +6,15 @@ import (
 )
 
 func testStatsImpl(t *testing.T, csvFn string) {
-	t.Log("Testing statsImpl")
 	var obj statsImplWrap
-	runner := testRunner{CsvFn: csvFn, TestT: t, Obj: &obj}
-	runner.Run()
+	runner := testRunner{CsvFn: csvFn, Obj: &obj}
+	t.Run(csvFn, runner.Run)
 }
 
 func testStats(t *testing.T, csvFn string) {
-	t.Log("Testing Stats")
 	var obj statsWrap
-	runner := testRunner{CsvFn: csvFn, TestT: t, Obj: &obj}
-	runner.Run()
+	runner := testRunner{CsvFn: csvFn, Obj: &obj}
+	t.Run(csvFn, runner.Run)
 }
 
 func TestEmpty(t *testing.T) {

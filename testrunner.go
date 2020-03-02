@@ -16,9 +16,6 @@ type testRunner struct {
 	// CsvFn is the path to the test file
 	CsvFn string
 
-	// TestT is the corresponding test handle
-	TestT *testing.T
-
 	// Obj is the object under test
 	Obj statsWrapper
 
@@ -30,13 +27,13 @@ type testRunner struct {
 }
 
 // Run loops over CsvFn, parses lines, and executes commands
-func (r *testRunner) Run() {
+func (r *testRunner) Run(t *testing.T) {
 	r.cget = make(chan []outputMessage)
 
 	csvfile, err := os.Open(r.CsvFn)
 	if err != nil {
-		r.TestT.Error(err)
-		r.TestT.FailNow()
+		t.Error(err)
+		t.FailNow()
 	}
 	defer csvfile.Close()
 
@@ -48,20 +45,20 @@ func (r *testRunner) Run() {
 			break
 		}
 		if err != nil {
-			r.TestT.Error(err)
+			t.Error(err)
 			continue
 		}
 
 		// Parse fields
 		cmd, err := parse(record)
 		if err != nil {
-			r.TestT.Error(err)
+			t.Error(err)
 		}
 
 		// Execute cmd
 		err = r.execute(cmd)
 		if err != nil {
-			r.TestT.Error(err)
+			t.Error(err)
 		}
 	}
 }
