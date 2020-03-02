@@ -80,7 +80,7 @@ func (r *testRunner) execute(cmd testCommand) error {
 		}(cmd.Action, cmd.Value)
 
 	case "add":
-		r.Obj.Add(cmd.Action, cmd.Value)
+		return r.Obj.Add(cmd.Action, cmd.Value)
 
 	case "getasync":
 		r.wg.Add(2)
