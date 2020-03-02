@@ -5,7 +5,6 @@ package actiontime
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 // Stats tracks passed actions' average times.
@@ -44,11 +43,6 @@ func (a *Stats) AddAction(input string) error {
 
 // GetStats returns the averages of all action times as a json-encoded string.
 func (a *Stats) GetStats() string {
-	b, err := json.Marshal(a.getStats())
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-
+	b, _ := json.Marshal(a.getStats())
 	return string(b)
 }
