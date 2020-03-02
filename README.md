@@ -2,11 +2,19 @@
 [![Build Status](https://travis-ci.com/aschult5/actiontime.svg?branch=master)](https://travis-ci.com/aschult5/actiontime)
 [![codecov](https://codecov.io/gh/aschult5/actiontime/branch/master/graph/badge.svg)](https://codecov.io/gh/aschult5/actiontime)
 
-A thread-safe Golang library that accepts a json serialized string of the form below and maintains an average time for each action.
+A thread-safe Golang library that accepts a json serialized string of the form below and maintains an average time for each action.  
+
+These inputs:
+
 ```json
 {"action":"jump", "time":100}
 {"action":"run", "time":75}
 {"action":"jump", "time":200}
+```
+
+Would lead to this output:
+```json
+[{"action":"jump","avg":150},{"action":"run","avg":75}]
 ```
 
 ## Disclaimer
