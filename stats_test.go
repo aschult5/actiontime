@@ -91,6 +91,11 @@ func BenchmarkAddAction(b *testing.B) {
 		{"100Add_2Go", 100, 2, []string{"jump"}},
 		{"100Add_4Go", 100, 4, []string{"jump"}},
 		{"100Add_8Go", 100, 8, []string{"jump"}},
+		{"100AddDiff_0Go", 100, 0, []string{"jump", "fall", "run", "walk", "sit", "stand"}},
+		{"100AddDiff_1Go", 100, 1, []string{"jump", "fall", "run", "walk", "sit", "stand"}},
+		{"100AddDiff_2Go", 100, 2, []string{"jump", "fall", "run", "walk", "sit", "stand"}},
+		{"100AddDiff_4Go", 100, 4, []string{"jump", "fall", "run", "walk", "sit", "stand"}},
+		{"100AddDiff_8Go", 100, 8, []string{"jump", "fall", "run", "walk", "sit", "stand"}},
 	}
 
 	for _, bm := range benchmarks {
