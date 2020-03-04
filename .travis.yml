@@ -4,7 +4,7 @@ go: "1.13.x"
 
 jobs:
   - env: TEST_ARGS="-race -short"
-  - env: TEST_ARGS="-bench . -benchmem -benchtime 30s -run=^$"
+  - env: TEST_ARGS="-bench . -benchmem -benchtime 30s -cpu 1,2,4 -run=^$"
   - env: TEST_ARGS="-coverprofile=coverage.txt -covermode=atomic"
     before_install:
       - sudo apt-get -y install python3
