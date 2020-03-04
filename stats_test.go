@@ -20,13 +20,15 @@ func BenchmarkGetStats(b *testing.B) {
 	// Define GetStats benchmark table
 	benchmarks := []struct {
 		name   string
+		numGet int
 		numAct int
 		numGo  int
 	}{
-		{"100Action_0Go", 100, 0},
-		{"100Action_2Go", 100, 2},
-		{"100Action_4Go", 100, 4},
-		{"100Action_8Go", 100, 8},
+		{"100Get_100Action_0Go", 100, 100, 0},
+		{"100Get_100Action_1Go", 100, 100, 1},
+		{"100Get_100Action_2Go", 100, 100, 2},
+		{"100Get_100Action_4Go", 100, 100, 4},
+		{"100Get_100Action_8Go", 100, 100, 8},
 	}
 
 	for _, bm := range benchmarks {
@@ -40,30 +42,37 @@ func BenchmarkGetStats(b *testing.B) {
 			}
 
 			var getFun func()
-			var sem chan bool
 			if bm.numGo <= 0 {
 				// Don't spawn goroutines
 				getFun = func() {
-					getStatsRes = s.GetStats()
+					for i := 0; i < bm.numGet; i++ {
+						getStatsRes = s.GetStats()
+					}
 				}
 			} else {
 				// Limit number of running goroutines with a semaphore
-				sem = make(chan bool, bm.numGo)
+				sem := make(chan bool, bm.numGo)
 				getFun = func() {
-					sem <- true
-					go func() {
-						defer func() { <-sem }()
-						getStatsRes = s.GetStats()
-					}()
+					for i := 0; i < bm.numGet; i++ {
+						sem <- true
+						go func() {
+							defer func() { <-sem }()
+							getStatsRes = s.GetStats()
+						}()
+					}
+					// Wait for remaining goroutines
+					for i := 0; i < cap(sem); i++ {
+						sem <- true
+					}
+					// Clear the sem
+					for i := 0; i < cap(sem); i++ {
+						<-sem
+					}
 				}
 			}
 
 			for n := 0; n < b.N; n++ {
 				getFun()
-			}
-			// Wait for remaining goroutines
-			for i := 0; i < cap(sem); i++ {
-				sem <- true
 			}
 		})
 	}
@@ -72,65 +81,70 @@ func BenchmarkGetStats(b *testing.B) {
 func BenchmarkAddAction(b *testing.B) {
 	// Define AddAction benchmark table
 	benchmarks := []struct {
-		name   string
-		numAdd int
-		numGo  int
+		name    string
+		numAdd  int
+		numGo   int
+		actions []string
 	}{
-		{"100Add_0Go", 100, 0},
-		{"100Add_2Go", 100, 2},
-		{"100Add_4Go", 100, 4},
-		{"100Add_8Go", 100, 8},
+		{"100Add_0Go", 100, 0, []string{"jump"}},
+		{"100Add_1Go", 100, 1, []string{"jump"}},
+		{"100Add_2Go", 100, 2, []string{"jump"}},
+		{"100Add_4Go", 100, 4, []string{"jump"}},
+		{"100Add_8Go", 100, 8, []string{"jump"}},
 	}
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
 			var s Stats
-
+			// Limit number of running goroutines with a semaphore
 			var addFun func()
-			var sem chan bool
 			if bm.numGo <= 0 {
 				// Don't spawn goroutines
 				addFun = func() {
-					err := addSame(bm.numAdd, &s)
-					if err != nil {
-						b.Error(err)
+					for i := 0; i < bm.numAdd; i++ {
+						// Loop over actions
+						arg := fmt.Sprintf(`{"action":"%s","time":%d}`,
+							bm.actions[i%len(bm.actions)], i+1)
+						if err := s.AddAction(arg); err != nil {
+							b.Log(arg)
+							b.Error(err)
+							break
+						}
 					}
 				}
 			} else {
-				// Limit number of running goroutines with a semaphore
-				sem = make(chan bool, bm.numGo)
+				sem := make(chan bool, bm.numGo)
 				addFun = func() {
-					sem <- true
-					go func() {
-						defer func() { <-sem }()
-						err := addSame(bm.numAdd, &s)
-						if err != nil {
-							b.Error(err)
-						}
-					}()
+					for i := 0; i < bm.numAdd; i++ {
+						arg := fmt.Sprintf(`{"action":"%s","time":%d}`,
+							bm.actions[i%len(bm.actions)], i+1)
+
+						// Call AddAction concurrently, up to numGo at once
+						sem <- true
+						go func(a string) {
+							defer func() { <-sem }()
+							if err := s.AddAction(a); err != nil {
+								b.Log(arg)
+								b.Error(err)
+							}
+						}(arg)
+					}
+					// Wait for remaining goroutines
+					for i := 0; i < cap(sem); i++ {
+						sem <- true
+					}
+					// Clear the sem
+					for i := 0; i < cap(sem); i++ {
+						<-sem
+					}
 				}
 			}
 
 			for n := 0; n < b.N; n++ {
 				addFun()
 			}
-			// Wait for remaining goroutines
-			for i := 0; i < cap(sem); i++ {
-				sem <- true
-			}
 		})
 	}
-}
-
-// addSame calls AddAction n times with the same action but different times
-func addSame(n int, s *Stats) error {
-	for i := 1; i <= n; i++ {
-		err := s.AddAction(fmt.Sprintf(`{"action":"stand","time":%d}`, i))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // addDifferent calls AddAction n times with different actions and times
