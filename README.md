@@ -99,7 +99,7 @@ You will be prompted with the command if you run `go test`.
 go test -bench . -benchmem -benchtime 10s -run=^$
 ```
 
-See [travis-ci](https://travis-ci.com/aschult5/actiontime) for latest benchmark results on a single core.
+See [travis-ci](https://travis-ci.com/aschult5/actiontime) for latest benchmark results.
 
 ### Checking code coverage
 ```bash
